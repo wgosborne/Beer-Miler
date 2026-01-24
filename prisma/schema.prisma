@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USERS TABLE
+// ============================================
+model User {
+  id                String      @id @default(cuid())
+  username          String      @unique
+  email             String      @unique
+  passwordHash      String
+  role              String      @default("user") // "admin" or "user"
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relations
+  availabilities    Availability[]
+  bets              Bet[]
+  leaderboardEntries LeaderboardEntry[]
+
+  @@map("users")
+}
+
+// ============================================
+// EVENT TABLE
+// ============================================
+model Event {
+  id                String      @id @default(cuid())
+  name              String      @default("Annie's Beer Mile")
+  status            String      @default("scheduled") // "scheduled", "in_progress", "completed"
+
+  // Calendar/Scheduling (Phase 1)
+  scheduledDate     DateTime?   // Date when event is locked (day only, no time)
+  lockedAt          DateTime?   // Timestamp when admin locked the date
+
+  // Results (Phase 2)
+  finalTimeSeconds  Int?        // Null until admin enters result
+  vomitOutcome      Boolean?    // Null until admin indicates yes/no
+  resultsFinalized  Boolean     @default(false) // Prevents double-finalization
+  finalizedAt       DateTime?   // When results were marked final
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relations
+  availabilities    Availability[]
+  bets              Bet[]
+  leaderboardEntries LeaderboardEntry[]
+
+  @@map("events")
+}
+
+// ============================================
+// AVAILABILITY TABLE (Phase 1)
+// ============================================
+model Availability {
+  id                String      @id @default(cuid())
+  userId            String
+  eventId           String
+  calendarDate      DateTime    // Date user is marking availability for
+  isAvailable       Boolean     @default(true) // true = available, false = out of town
+  updatedAt         DateTime    @updatedAt
+
+  // Relations
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event             Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([userId, eventId, calendarDate])
+  @@index([eventId])
+  @@index([userId])
+  @@map("availabilities")
+}
+
+// ============================================
+// BETS TABLE (Phase 2)
+// ============================================
+model Bet {
+  id                String      @id @default(cuid())
+  eventId           String
+  userId            String
+  betType           String      // "time_over_under" | "exact_time_guess" | "vomit_prop"
+  status            String      @default("pending") // "pending" | "won" | "lost"
+  pointsAwarded     Int         @default(0) // 0 or 1
+
+  // Flexible JSON storage for bet-type-specific data
+  // See BetData union type in code for shape
+  betData           Json
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relations
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event             Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([betType])
+  @@map("bets")
+}
+
+// ============================================
+// LEADERBOARD_ENTRIES TABLE
+// ============================================
+model LeaderboardEntry {
+  id                String      @id @default(cuid())
+  userId            String
+  eventId           String
+  pointsEarned      Int         @default(0)
+  rank              Int?        // Calculated when results finalize
+  updatedAt         DateTime    @updatedAt
+
+  // Relations
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event             Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([eventId])
+  @@index([pointsEarned])
+  @@map("leaderboard_entries")
+}
