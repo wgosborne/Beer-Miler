@@ -174,16 +174,48 @@
 
 ---
 
-## 3. Phase 1b: Calendar & Availability (Next)
+## 3. Phase 1b: Calendar & Availability (COMPLETE)
 
-Will implement after Phase 1a auth is working:
-- GET /api/event/current (Event status endpoint)
-- GET /api/availability?month=YYYY-MM (Calendar data)
-- POST /api/availability (Mark availability)
-- POST /api/admin/lock-date (Lock consensus date)
-- Calendar component (3-month grid, color-coded)
-- AdminLockPanel component
-- /calendar page
+### Completed
+- [x] GET /api/event/current (Event status endpoint)
+- [x] GET /api/availability?month=YYYY-MM (Calendar data with consensus calculation)
+- [x] POST /api/availability (Mark availability for dates)
+- [x] POST /api/admin/lock-date (Lock consensus date - admin only)
+- [x] Calendar component (3-month grid, color-coded, interactive)
+- [x] AdminLockPanel component (Admin controls to lock date)
+- [x] /calendar page (Full calendar interface with sidebar)
+- [x] Authentication helper in auth.ts (getSessionFromRequest)
+- [x] Test users created for manual testing
+
+### Files Created (Phase 1b)
+- `src/app/api/event/current/route.ts` - Event status endpoint
+- `src/app/api/availability/route.ts` - GET/POST availability
+- `src/app/api/admin/lock-date/route.ts` - Admin lock date endpoint
+- `src/components/Calendar.tsx` - Calendar component with color coding
+- `src/components/AdminLockPanel.tsx` - Admin controls panel
+- `src/app/calendar/page.tsx` - Calendar page (client component)
+- Updated `src/lib/auth.ts` - Added getSessionFromRequest helper
+
+### Features Implemented
+1. **Event API** - Returns current event status (locked date, results, etc.)
+2. **Availability Tracking** - Users can mark dates available/unavailable
+3. **Consensus Calculation** - Shows which dates have ALL users available (green)
+4. **Admin Lock** - Only admins can lock a consensus date
+5. **3-Month Window** - Validates dates within 3-month rolling window
+6. **Color Coding**
+   - Green: All users available (consensus)
+   - Blue: User available
+   - Red: User unavailable
+   - Gray: Past date or not marked
+7. **Lock Prevention** - Once locked, availability becomes read-only
+8. **TypeScript Types** - Full type safety throughout
+
+### Validation Rules
+- Can only update dates within 3-month window
+- Cannot update past dates
+- Cannot update when event is locked
+- Admin can only lock dates with 100% consensus (all users available)
+- Cannot lock past dates
 
 ---
 
@@ -434,13 +466,21 @@ curl -X POST http://localhost:3001/api/auth/signup \
 
 ### Phase 1a Notes
 - Dev server runs on port 3001 (configured in package.json)
-- NEXTAUTH_URL must match dev server port (http://localhost:3001)
+- NEXTAUTH_URL must match dev server port (http://localhost:3001) - FIXED Jan 25
+- NEXT_PUBLIC_API_URL also updated to port 3001 - FIXED Jan 25
 - Sessions persist for 30 days via JWT tokens
 - All new users created with role="user"; admin role must be manually set or use seed
 - Password requirements: 8+ chars, at least one number, at least one special character
 - Email uniqueness enforced at database level (unique constraint)
 - Logout handled client-side via NextAuth signOut() function
 - Middleware allows /api/auth/* routes without authentication for NextAuth flow
+
+### Auth Callback 404 Fix (Jan 25)
+- ISSUE: When calling signIn('credentials', ...), NextAuth internally posts to /api/auth/callback/credentials
+- ROOT CAUSE: NEXTAUTH_URL was incorrectly set to http://localhost:3000 while dev server runs on port 3001
+- This mismatch caused NextAuth to generate incorrect internal redirect URLs
+- FIX: Updated .env.local NEXTAUTH_URL from port 3000 → port 3001
+- The [...]nextauth catch-all route was already correct; the issue was purely the environment variable mismatch
 
 ### TypeScript / Build Notes
 - Session types extended in src/lib/types.ts module declaration
@@ -450,6 +490,35 @@ curl -X POST http://localhost:3001/api/auth/signup \
 
 ---
 
+## Testing Phase 1b
+
+### Quick Start
+```bash
+npm run dev  # Start on http://localhost:3001
+```
+
+### Test Users
+- Admin: admin@beer-mile.test / admin123
+- Alice: alice@example.com / Alice123@
+- Bob: bob@example.com / Bobby123@
+- Charlie: charlie@example.com / Charlie123@
+- TestUser1: test1@example.com / Test123@
+
+### Browser Testing
+1. Visit http://localhost:3001/calendar
+2. Login with any test user
+3. Mark dates as available/unavailable (blue = available, red = unavailable)
+4. Switch to admin user to see AdminLockPanel
+5. When all users mark the same date available (shows green), admin can lock it
+
+### API Testing (with authenticated request)
+The endpoints are protected by middleware. Access them through the browser UI or by:
+1. Getting a valid session cookie from login
+2. Using that cookie in API requests
+
+---
+
 **Last Updated:** 2026-01-25 by Claude (Implementer Agent)
-**Next Phase:** Phase 1b - Calendar & Availability Tracking
-**Ready for Review:** Yes - Phase 1a authentication complete and tested
+**Current Phase:** Phase 1b - Calendar & Availability Tracking (COMPLETE)
+**Next Phase:** Phase 1c - Betting System
+**Ready for Review:** Yes - Phase 1b complete with full calendar implementation

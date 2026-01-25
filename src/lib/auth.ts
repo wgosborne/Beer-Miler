@@ -1,6 +1,8 @@
 import { type NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
+import { getToken } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
 import { prisma } from './prisma';
 import { LoginSchema } from './validation';
 
@@ -83,3 +85,26 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
+
+/**
+ * Get session from NextAuth JWT token in API routes
+ */
+export async function getSessionFromRequest(request: NextRequest) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  if (!token) {
+    return null;
+  }
+
+  return {
+    user: {
+      id: token.id as string,
+      email: token.email as string,
+      username: token.username as string,
+      role: token.role as string,
+    },
+  };
+}
