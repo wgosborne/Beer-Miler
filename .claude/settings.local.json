@@ -6,7 +6,10 @@
       "Bash(npx prisma migrate:*)",
       "Bash(npx dotenv:*)",
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_KzgbpcDJ9Vv2@ep-wispy-star-ae1i0hdg-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" npx prisma migrate:*)",
-      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_KzgbpcDJ9Vv2@ep-wispy-star-ae1i0hdg-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" npx prisma db seed:*)"
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_KzgbpcDJ9Vv2@ep-wispy-star-ae1i0hdg-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" npx prisma db seed:*)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)"
     ]
   }
 }
