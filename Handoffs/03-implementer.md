@@ -219,29 +219,93 @@
 
 ---
 
-## 4. Phase 1c: Betting System (Next)
+## 4. Phase 1c: Betting System (IN PROGRESS)
 
-Will implement after Phase 1a auth is working:
-- POST /api/bets (Place bet with validation)
-- GET /api/bets (View bets + distribution)
-- DELETE /api/bets/[id] (Delete bet)
-- Bet form components (Time O/U, ExactTime, VomitProp)
-- BetDistribution & MyBets components
-- /betting page
+### Completed (Jan 31, 2026)
+- [x] POST /api/bets - Place bet with validation (handles all 3 types)
+- [x] GET /api/bets - View user's bets + bet distribution stats
+- [x] DELETE /api/bets/[id] - Delete pending bets
+- [x] lib/scoring.ts - Complete scoring logic module
+  - scoreAllBets: Main scoring function
+  - scoreTimeOverUnderBet: Over/under threshold comparison
+  - scoreExactTimeGuessBet: Distance calculation
+  - scoreVomitPropBet: Yes/no prediction matching
+  - findClosestGuesses: Tie-breaking (both get points)
+  - generateScoringPreview: Preview before finalization
+  - secondsToMMSS / mmssToSeconds: Time formatting helpers
+- [x] POST /api/admin/results - Enter final time + vomit outcome, generate preview
+- [x] POST /api/admin/finalize-results - Lock results, update all bets & leaderboard
+- [x] POST /api/admin/reset-results - Reset if admin data entry error
+- [x] GET /api/leaderboard - Ranked leaderboard with per-user bet breakdown
+- [x] BetForm.tsx - Three separate form components (TimeOverUnder, ExactTimeGuess, VomitProp)
+- [x] MyBetsList.tsx - Display user's bets with delete option
+- [x] BetDistribution.tsx - Show aggregate bet statistics
+- [x] Leaderboard.tsx - Ranked leaderboard with optional detailed breakdown
+- [x] /betting page - Main betting interface with form selection, my bets, distribution
+- [x] /results page - Admin results form with preview + leaderboard view
+- [x] /leaderboard page - Dedicated leaderboard with quick stats
+- [x] Updated home page with navigation links to all features
+
+### Files Created (Phase 1c)
+- `src/app/api/bets/route.ts` - POST/GET endpoints
+- `src/app/api/bets/[id]/route.ts` - DELETE endpoint
+- `src/lib/scoring.ts` - Scoring logic module
+- `src/app/api/admin/results/route.ts` - Enter results endpoint
+- `src/app/api/admin/finalize-results/route.ts` - Finalize results endpoint
+- `src/app/api/admin/reset-results/route.ts` - Reset results endpoint
+- `src/app/api/leaderboard/route.ts` - Leaderboard API endpoint
+- `src/components/BetForm.tsx` - Form component with 3 bet type forms
+- `src/components/MyBetsList.tsx` - Display user bets list
+- `src/components/BetDistribution.tsx` - Show bet distribution stats
+- `src/components/Leaderboard.tsx` - Leaderboard display with medals
+- `src/app/betting/page.tsx` - Betting interface page
+- `src/app/results/page.tsx` - Results & admin form page
+- `src/app/leaderboard/page.tsx` - Dedicated leaderboard page
+
+### Features Implemented
+1. **Bet Placement**
+   - Three bet types: time over/under, exact time guess, vomit prop
+   - Validation for all inputs (time limits 0-1200s, valid predictions)
+   - Uniqueness enforcement: exact_time_guess and vomit_prop per user per event
+   - Multiple time_over_under bets allowed with different thresholds
+   - Cannot place bets if: event not locked, results finalized
+
+2. **Scoring System**
+   - Over/Under: Compares final time to threshold (>, <)
+   - Exact Time: Distance calculation with tie-breaking (both get point if equally close)
+   - Vomit Prop: Matches prediction (yes/no) to outcome
+   - Preview generation before finalization
+   - Automatic leaderboard recalculation
+
+3. **Admin Controls**
+   - Enter final time (MM:SS format) and vomit outcome
+   - Preview winners before finalizing
+   - Finalize to lock results (idempotent check)
+   - Reset if data entry error (audit trail required)
+
+4. **UI Components**
+   - Intuitive bet forms with common threshold suggestions
+   - Real-time bet list with delete option
+   - Aggregate distribution showing bet spread
+   - Medal-based leaderboard with optional detailed breakdown
+   - Admin form with preview before finalization
+
+### Validation Rules
+- Event must be locked (scheduled date set) to place bets
+- Results cannot be finalized already
+- Time values: 0-1200 seconds (0-20 minutes)
+- Exact time guess: 1 per user per event (replaces previous)
+- Vomit prop: 1 per user per event (replaces previous)
+- Time over/under: Unlimited (different thresholds)
+- Cannot delete bets after results finalized
+- Cannot reset results after finalized
 
 ---
 
-## 5. Phase 2: Results & Leaderboard (Next)
+## 5. Phase 2: Results & Leaderboard (COMPLETE IN 1c)
 
-Will implement after Phase 1a/1b/1c:
-- POST /api/admin/results (Enter final time & vomit outcome, preview winners)
-- POST /api/admin/finalize-results (Lock results)
-- POST /api/admin/reset-results (Revert results before finalization)
-- GET /api/leaderboard (Ranked leaderboard with bet breakdown)
-- Scoring logic module (lib/scoring.ts)
-- AdminResultsForm component
-- Leaderboard page
-- Results page
+Note: Results and leaderboard functionality fully implemented in Phase 1c.
+This includes all admin operations and viewing logic.
 
 ---
 
@@ -272,7 +336,7 @@ beer-mile/
 ├── postcss.config.js
 ├── .eslintrc.json
 ├── prisma/
-│   ├── schema.prisma                 (5 models defined)
+│   ├── schema.prisma                 (5 models: User, Event, Availability, Bet, LeaderboardEntry)
 │   ├── seed.ts                       (Admin + event seeded)
 │   └── migrations/
 │       └── 20260124150516_init/
@@ -280,31 +344,66 @@ beer-mile/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx               (Root + SessionProvider)
-│   │   ├── page.tsx                 (Home dashboard)
+│   │   ├── page.tsx                 (Home dashboard with nav links)
 │   │   ├── globals.css              (Tailwind)
 │   │   ├── (auth)/                  (Route group for auth pages)
 │   │   │   ├── login/
 │   │   │   │   └── page.tsx         (Login form)
 │   │   │   └── signup/
 │   │   │       └── page.tsx         (Signup form)
+│   │   ├── calendar/                (Phase 1b)
+│   │   │   └── page.tsx             (Calendar interface)
+│   │   ├── betting/                 (Phase 1c - NEW)
+│   │   │   └── page.tsx             (Betting interface)
+│   │   ├── results/                 (Phase 1c - NEW)
+│   │   │   └── page.tsx             (Results & admin form)
+│   │   ├── leaderboard/             (Phase 1c - NEW)
+│   │   │   └── page.tsx             (Leaderboard display)
 │   │   └── api/
-│   │       └── auth/
-│   │           ├── [...nextauth]/
-│   │           │   └── route.ts     (NextAuth handler)
-│   │           ├── signup/
-│   │           │   └── route.ts     (Register API)
-│   │           └── logout/
-│   │               └── route.ts     (Logout API)
+│   │       ├── auth/
+│   │       │   ├── [...nextauth]/
+│   │       │   │   └── route.ts     (NextAuth handler)
+│   │       │   ├── signup/
+│   │       │   │   └── route.ts     (Register API)
+│   │       │   └── logout/
+│   │       │       └── route.ts     (Logout API)
+│   │       ├── event/
+│   │       │   └── current/
+│   │       │       └── route.ts     (Event status)
+│   │       ├── availability/
+│   │       │   └── route.ts         (GET/POST availability)
+│   │       ├── bets/                (Phase 1c - NEW)
+│   │       │   ├── route.ts         (POST/GET bets)
+│   │       │   └── [id]/
+│   │       │       └── route.ts     (DELETE bet)
+│   │       ├── leaderboard/         (Phase 1c - NEW)
+│   │       │   └── route.ts         (GET leaderboard)
+│   │       └── admin/
+│   │           ├── lock-date/
+│   │           │   └── route.ts     (Lock event date)
+│   │           ├── results/         (Phase 1c - NEW)
+│   │           │   └── route.ts     (Enter results)
+│   │           ├── finalize-results/ (Phase 1c - NEW)
+│   │           │   └── route.ts     (Finalize results)
+│   │           └── reset-results/   (Phase 1c - NEW)
+│   │               └── route.ts     (Reset results)
 │   ├── components/
-│   │   └── SessionProviderWrapper.tsx  (Client SessionProvider)
+│   │   ├── SessionProviderWrapper.tsx  (Client SessionProvider)
+│   │   ├── Calendar.tsx             (Phase 1b)
+│   │   ├── AdminLockPanel.tsx       (Phase 1b)
+│   │   ├── BetForm.tsx              (Phase 1c - NEW)
+│   │   ├── MyBetsList.tsx           (Phase 1c - NEW)
+│   │   ├── BetDistribution.tsx      (Phase 1c - NEW)
+│   │   └── Leaderboard.tsx          (Phase 1c - NEW)
 │   ├── lib/
 │   │   ├── prisma.ts               (Singleton)
-│   │   ├── validation.ts           (Zod schemas)
+│   │   ├── validation.ts           (Zod schemas - updated for Phase 1c)
 │   │   ├── utils.ts                (Helper functions)
-│   │   ├── auth.ts                 (NextAuth config - NEW)
-│   │   └── types.ts                (TypeScript extensions - NEW)
-│   ├── middleware.ts               (Route protection - NEW)
-│   └── context/                    (To be created)
+│   │   ├── auth.ts                 (NextAuth config)
+│   │   ├── types.ts                (TypeScript extensions)
+│   │   └── scoring.ts              (Phase 1c - NEW, Scoring logic)
+│   ├── middleware.ts               (Route protection)
+│   └── context/                    (To be created in Phase 3)
 ├── Handoffs/
 │   ├── 01-requirements.md
 │   ├── 02-architecture.md
@@ -372,33 +471,42 @@ curl -X POST http://localhost:3001/api/auth/signup \
 
 ## 10. Next Actions
 
-### Immediate (Phase 1b)
-1. **Implement Calendar Endpoints:**
-   - GET /api/event/current - Return current event status
-   - GET /api/availability?month=YYYY-MM - Return user availability grid
-   - POST /api/availability - Mark dates available/unavailable
+### Immediate (Phase 3: Testing & Polish)
+1. **Testing & Bug Fixes**
+   - Test all bet placement workflows end-to-end
+   - Test exact time guess tie-breaking
+   - Test admin result entry and finalization
+   - Test results cannot be changed after finalization
+   - Test leaderboard updates correctly
 
-2. **Build Calendar UI:**
-   - Create Calendar component (3-month grid with color coding)
-   - Create /calendar page with availability tracker
-   - Add AdminLockPanel for date consensus
+2. **Error Handling Audit**
+   - Review all error messages are user-friendly
+   - Ensure proper HTTP status codes
+   - Handle edge cases (no users, ties, zero points, etc.)
 
-3. **Admin Lock Date:**
-   - POST /api/admin/lock-date - Lock event date when consensus reached
-   - Update event.scheduledDate and event.lockedAt
-   - Verify all users have marked availability on that date
+3. **UI Polish**
+   - Responsive design for mobile betting
+   - Loading states and animations
+   - Better form UX (MM:SS picker, threshold suggestions)
+   - Accessibility audit
 
-### Later (Phase 1c)
-4. **Betting System:**
-   - Create bet placement APIs (3 types: over/under, exact time, vomit prop)
-   - Build bet UI and leaderboard
-   - Scoring logic
+4. **Logging & Monitoring**
+   - Add structured logging for all operations
+   - Track bet placement, scoring, finalization
+   - Error logs for debugging
 
-### Phase 2+
-5. **Results & Finalization:**
-   - Admin results entry and preview
-   - Scoring calculation
-   - Leaderboard ranking
+5. **Documentation**
+   - Testing guide for manual QA
+   - Admin user guide for results entry
+   - User guide for betting system
+
+### Phase 4+
+6. **Advanced Features:**
+   - Email notifications when date locked / results finalized
+   - Real-time bet distribution updates
+   - Achievement badges
+   - Chat/trash talk feature
+   - Multi-event support
 
 ---
 
@@ -419,6 +527,17 @@ curl -X POST http://localhost:3001/api/auth/signup \
 - **Client Wrapper:** SessionProvider wrapped in client component to avoid metadata conflicts in root layout.
 - **Automatic Leaderboard:** New users automatically added to leaderboard_entries table with 0 points upon signup.
 - **Type Safety:** Extended NextAuth types for Session/JWT to include username and role for strict type checking.
+
+### Phase 1c Decisions
+- **Bet Uniqueness:** Enforce 1 exact_time_guess and 1 vomit_prop per user per event via database upsert (delete old, create new).
+- **Unlimited Over/Under:** Users can place multiple time_over_under bets with different thresholds for flexibility.
+- **Tie-Breaking:** Both users get 1 point if equally close on exact time guess (fairness over winner-take-all).
+- **Preview Before Finalize:** Admin must preview winners before finalizing to prevent accidental misconfigurations.
+- **Idempotent Finalize:** Check resultsFinalized flag before updating to prevent double-finalization.
+- **Reset with Audit Trail:** Reset endpoint requires reason for audit trail before wiping scores.
+- **Scoring Module:** Separated all scoring logic into lib/scoring.ts for testability and maintainability.
+- **Client-Side Forms:** Use separate form components (TimeOverUnderForm, etc.) for better UX and type safety per bet type.
+- **Leaderboard Denormalization:** Store final points/rank in leaderboard_entries table, calculated once at finalization for fast queries.
 
 ---
 
@@ -453,6 +572,86 @@ curl -X POST http://localhost:3001/api/auth/signup \
 - [x] New users automatically added to leaderboard on signup
 
 **Phase 1a Status:** ✅ COMPLETE
+
+## 15. Success Criteria (Phase 1c)
+
+- [x] All three bet types can be placed (time over/under, exact time guess, vomit prop)
+- [x] Validation enforces: event locked, results not finalized, time limits 0-1200s
+- [x] Exact time guess and vomit prop: max 1 per user per event (replace old)
+- [x] Time over/under: unlimited with different thresholds
+- [x] Bet distribution shows aggregate stats (counts, guesses, predictions)
+- [x] Scoring logic implemented for all bet types
+- [x] Tie-breaking: both users get point if equally close
+- [x] Admin can enter final time and vomit outcome
+- [x] Admin can preview winners before finalizing
+- [x] Admin can finalize results (idempotent)
+- [x] Admin can reset results before finalization (with audit trail)
+- [x] Leaderboard displays ranked users by points
+- [x] Leaderboard shows detailed bet breakdown when expanded
+- [x] Users cannot place/delete bets after results finalized
+- [x] All API endpoints have proper error handling and validation
+- [x] All pages are client-safe with proper authentication checks
+- [x] Home page updated with navigation to all features
+
+**Phase 1c Status:** ✅ COMPLETE
+
+---
+
+## Testing Phase 1c
+
+### Quick Start
+```bash
+npm run dev  # Start on http://localhost:3001
+```
+
+### Test Workflow
+1. **Login as regular user** (alice@example.com / Alice123@)
+2. **Go to /betting page**
+3. **Place a time over/under bet** (e.g., under 6 minutes)
+4. **Place an exact time guess** (e.g., 5:47)
+5. **Place a vomit prop** (yes or no)
+6. **View your bets** in the "My Bets" section
+7. **See distribution** in "Bet Distribution" section
+8. **Login as admin** (admin@beer-mile.test / admin123)
+9. **Go to /results page**
+10. **Enter final time** (e.g., 5:45)
+11. **Select vomit outcome** (yes/no)
+12. **Preview results** - should show winners
+13. **Finalize results** - locks leaderboard
+14. **View /leaderboard** - should show final rankings with medal emojis
+
+### API Testing (with curl or Postman)
+```bash
+# Place over/under bet (need auth session)
+curl -X POST http://localhost:3001/api/bets \
+  -H "Content-Type: application/json" \
+  -d '{"betType":"time_over_under","thresholdSeconds":360,"direction":"over"}'
+
+# Get all bets and distribution
+curl http://localhost:3001/api/bets
+
+# Enter results (admin only)
+curl -X POST http://localhost:3001/api/admin/results \
+  -H "Content-Type: application/json" \
+  -d '{"finalTimeSeconds":345,"vomitOutcome":false}'
+
+# Finalize results (admin only)
+curl -X POST http://localhost:3001/api/admin/finalize-results \
+  -H "Content-Type: application/json" \
+  -d '{"confirm":true}'
+
+# Get leaderboard
+curl http://localhost:3001/api/leaderboard
+```
+
+### Edge Cases to Test
+1. User tries to place exact_time_guess, then places another - old one should be deleted
+2. User tries to place vomit_prop, then changes mind - old one should be deleted
+3. User tries to delete bet after results finalized - should get error
+4. Admin tries to finalize twice - should get "already finalized" error
+5. Admin tries to reset after finalization - should get error
+6. No consensus date reached - betting page should say event not locked
+7. Multiple users with same exact time distance - both should get 1 point
 
 ---
 
@@ -518,7 +717,33 @@ The endpoints are protected by middleware. Access them through the browser UI or
 
 ---
 
-**Last Updated:** 2026-01-25 by Claude (Implementer Agent)
-**Current Phase:** Phase 1b - Calendar & Availability Tracking (COMPLETE)
-**Next Phase:** Phase 1c - Betting System
-**Ready for Review:** Yes - Phase 1b complete with full calendar implementation
+**Last Updated:** 2026-01-31 by Claude (Implementer Agent)
+**Current Phase:** Phase 1c - Betting System (COMPLETE)
+**Completed Phases:** Phase 0 (Setup), Phase 1a (Auth), Phase 1b (Calendar), Phase 1c (Betting)
+**Next Phase:** Phase 3 - Testing, Polish, Logging, and Deployment
+**Ready for Review:** Yes - Phase 1c complete with all betting, scoring, and admin functionality
+
+## Summary of Implementation
+
+**Annie's Beer Mile Betting App - Complete Phase 1 Implementation:**
+
+The application now supports the full Phase 1 feature set:
+1. User authentication (signup/login with JWT sessions)
+2. Calendar with availability tracking (3-month rolling window, consensus calculation)
+3. Admin lock date functionality
+4. Complete betting system with 3 bet types
+5. Scoring logic with tie-breaking
+6. Admin results entry with preview
+7. Leaderboard with detailed breakdowns
+
+**Code Quality:**
+- Full TypeScript with strict mode
+- Zod validation on all inputs
+- Proper error handling with meaningful messages
+- Modular architecture (scoring in lib/scoring.ts)
+- Client/server separation (use client for components, route handlers for API)
+- Database relationships and constraints in Prisma schema
+
+**Next for Tester:** Run full end-to-end test workflow from betting to finalization
+**Next for Designer:** Review UI/UX, suggest polish improvements
+**Next for Deployer:** Prepare deployment to Render with Neon PostgreSQL

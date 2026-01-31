@@ -148,25 +148,26 @@ export const Calendar: React.FC<CalendarProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold mb-4 text-center">
+    <div className="bg-white rounded-lg border border-primary-200 shadow-sm p-4 sm:p-6">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center text-primary-900">
         {MONTH_NAMES[month - 1]} {year}
       </h2>
 
       {/* Day names header */}
-      <div className="grid grid-cols-7 gap-2 mb-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2">
         {DAY_NAMES.map((name) => (
           <div
             key={name}
-            className="text-center font-semibold text-gray-700 py-2"
+            className="text-center font-semibold text-primary-700 py-2 text-xs sm:text-sm"
           >
-            {name}
+            <span className="hidden sm:inline">{name}</span>
+            <span className="sm:hidden">{name[0]}</span>
           </div>
         ))}
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {grid.map((week, weekIdx) =>
           week.map((day, dayIdx) => {
             const cellKey = `${weekIdx}-${dayIdx}`;
@@ -189,7 +190,7 @@ export const Calendar: React.FC<CalendarProps> = ({
                 key={cellKey}
                 onClick={() => handleDateClick(day)}
                 disabled={eventLocked || isPast || loading || isLoading}
-                className={`rounded p-2 text-center font-semibold transition-colors min-h-12 flex items-center justify-center ${getDateColorClass(
+                className={`rounded p-1 sm:p-2 text-center font-semibold transition-colors min-h-10 sm:min-h-12 flex items-center justify-center text-xs sm:text-sm ${getDateColorClass(
                   dateStr,
                   dayData,
                   userAvail,
@@ -198,7 +199,7 @@ export const Calendar: React.FC<CalendarProps> = ({
                 )} ${isLoading ? 'opacity-50' : ''}`}
                 title={getDateTooltip(dayData, userAvail, isPast)}
               >
-                <span className="text-sm">{day}</span>
+                <span>{day}</span>
               </button>
             );
           })
@@ -206,9 +207,9 @@ export const Calendar: React.FC<CalendarProps> = ({
       </div>
 
       {/* Legend */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <h3 className="font-semibold mb-3">Legend</h3>
-        <div className="grid grid-cols-2 gap-3 text-sm">
+      <div className="mt-6 pt-4 border-t border-primary-200">
+        <h3 className="font-semibold text-primary-900 mb-3 text-sm">Legend</h3>
+        <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
             <span>Consensus (all available)</span>
@@ -234,18 +235,18 @@ export const Calendar: React.FC<CalendarProps> = ({
 
       {/* Consensus info */}
       {consensusDates.length > 0 && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded">
-          <h3 className="font-semibold text-green-900 mb-2">Available Dates (Green)</h3>
-          <p className="text-sm text-green-800">
+        <div className="mt-6 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
+          <h3 className="font-semibold text-green-900 mb-2 text-sm">Available Dates</h3>
+          <p className="text-xs sm:text-sm text-green-800 break-words">
             {consensusDates.map((d) => formatDateDisplay(new Date(d))).join(', ')}
           </p>
         </div>
       )}
 
       {eventLocked && (
-        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
-          <p className="text-sm text-blue-900 font-semibold">
-            ✓ Event date is locked. Availability cannot be changed.
+        <div className="mt-4 p-3 sm:p-4 bg-primary-50 border border-primary-200 rounded-lg">
+          <p className="text-xs sm:text-sm text-primary-900 font-semibold">
+            Event date is locked. Availability cannot be changed.
           </p>
         </div>
       )}

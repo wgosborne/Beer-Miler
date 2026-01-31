@@ -1,10 +1,10 @@
 # Annie's Beer Mile Betting App
 
-A friendly betting application for a 8-12 person friend group to place wagers on Annie's beer mile performance (a humorous fantasy football consequence). No monetary transactions—just points and bragging rights.
+A friendly betting application for a 8-12 person friend group to place wagers on Annie's beer mile performance. No monetary transactions—just points and bragging rights.
 
 ## Current Phase
 
-**Architecture & Planning** → Ready for implementation (Phase 1: Calendar scheduling)
+**Phase 1 Complete** (Calendar & Availability) → Phase 2 ready (Betting System)
 
 ## Tech Stack
 
@@ -109,38 +109,23 @@ npx prisma db seed  # Creates admin user + initial event
 
 ## Current Status
 
-- [x] Requirements gathered & documented
-- [x] Architecture designed (tech stack, data model, API, components)
-- [ ] **Implementation (Phase 1)**: Calendar, availability tracking, consensus lock
-- [ ] **Testing Phase 1**: Unit tests, integration tests
+- [x] Requirements & architecture documented
+- [x] **Phase 1 Complete**: Calendar UI, availability tracking, admin lock-date
+- [ ] **Testing Phase 1**: Unit & integration tests
 - [ ] **Implementation (Phase 2)**: Betting system, results, leaderboard
 - [ ] **Testing Phase 2**: Scoring logic, edge cases
-- [ ] **Deployment**: Render setup, database migrations, seed data
+- [ ] **Production Deployment**: Render setup, migrations, seed data
 
 ## Next Steps
 
-1. **Set up project scaffolding**:
-   - Create Next.js 14 project with TypeScript
-   - Install Prisma, NextAuth, Tailwind, Zod
-   - Configure database connection to Neon
-
-2. **Implement Phase 1 (Calendar)**:
-   - Create Prisma schema (User, Event, Availability tables)
-   - Build auth (signup/login with NextAuth)
-   - Build calendar UI (3-month grid, color-coded)
-   - Build availability API (mark/unmark dates)
-   - Build admin lock-date API
-   - Test consensus logic thoroughly
-
-3. **Deploy Phase 1 to Render** for user feedback
-
-4. **Layer Phase 2 (Betting)**:
+1. **Test Phase 1**: Write unit & integration tests for calendar logic
+2. **Implement Phase 2**:
    - Add Bet and LeaderboardEntry tables
    - Build bet placement UI (3 bet types)
    - Build admin results form & scoring logic
    - Build leaderboard display
-
-5. **Final testing & polish** before full release
+3. **Test Phase 2**: Verify scoring edge cases and consensus logic
+4. **Deploy to Production**: Push to Render with database migrations
 
 ## Open Questions / Notes
 
@@ -180,6 +165,6 @@ npx prisma generate     # Regenerate Prisma client
 
 ---
 
-**Last Updated**: 2026-01-19
+**Last Updated**: 2026-01-31
 **Owner**: Friend group (8-12 people)
 **Contact**: Admin contact needed for deployment credentials

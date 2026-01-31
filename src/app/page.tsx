@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -8,93 +8,148 @@ export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push('/auth/login');
-  };
-
   if (status === 'loading') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center p-4">
-        <p className="text-gray-600">Loading...</p>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <div className="inline-block animate-spin text-4xl mb-2">⏳</div>
+          <p className="text-gray-600 text-sm sm:text-base">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="flex items-center justify-center min-h-[70vh] px-4">
+        <div className="w-full max-w-sm text-center">
+          <div className="mb-6">
+            <p className="text-4xl mb-4">🍺</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-primary-900 mb-2">
+              Annie's Beer Mile
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Join the friendly betting app for Annie's beer mile performance!
+            </p>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            <Link
+              href="/auth/login"
+              className="block w-full px-4 py-3 sm:py-4 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="block w-full px-4 py-3 sm:py-4 border-2 border-primary-600 text-primary-700 font-semibold rounded-lg hover:bg-primary-50 transition-colors text-sm sm:text-base"
+            >
+              Create Account
+            </Link>
+          </div>
+
+          <div className="bg-primary-50 rounded-lg p-4 text-xs sm:text-sm text-left text-gray-700">
+            <p className="font-semibold text-primary-900 mb-2">Demo Credentials:</p>
+            <p>Email: <code className="bg-white px-2 py-1 rounded text-xs">admin@beer-mile.test</code></p>
+            <p>Password: <code className="bg-white px-2 py-1 rounded text-xs">admin123</code></p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4">
-      <div className="w-full max-w-4xl">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Annie's Beer Mile</h1>
-          {session && (
-            <div className="flex items-center gap-4">
-              <span className="text-gray-600">Welcome, {session.user?.username}!</span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-              >
-                Logout
-              </button>
-            </div>
+    <div className="min-h-[calc(100vh-60px)] bg-gradient-to-b from-primary-50 to-white">
+      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        {/* Welcome */}
+        <div className="mb-6 sm:mb-8">
+          <p className="text-sm text-primary-600 font-semibold mb-1">Welcome back!</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">
+            {session.user?.username}
+          </h1>
+          {session.user?.role === 'admin' && (
+            <p className="text-xs sm:text-sm text-primary-600 font-semibold mt-1">Admin Access Enabled</p>
           )}
         </div>
 
-        {session ? (
-          <div className="space-y-6">
-            <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
-              <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
-              <p className="text-gray-600 mb-6">
-                Welcome to Annie's Beer Mile betting app! This is your dashboard.
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-3 mb-6 sm:mb-8">
+          <Link
+            href="/calendar"
+            className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white rounded-lg border-2 border-primary-200 hover:border-primary-400 hover:shadow-md transition-all"
+          >
+            <span className="text-2xl sm:text-3xl mb-2">📅</span>
+            <span className="text-xs sm:text-sm font-semibold text-primary-900">Calendar</span>
+            <span className="text-xs text-gray-500 mt-1">Availability</span>
+          </Link>
+
+          <Link
+            href="/calendar"
+            className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white rounded-lg border-2 border-gray-200 hover:border-gray-400 hover:shadow-md transition-all opacity-60 cursor-not-allowed"
+          >
+            <span className="text-2xl sm:text-3xl mb-2">🎲</span>
+            <span className="text-xs sm:text-sm font-semibold text-gray-600">Betting</span>
+            <span className="text-xs text-gray-400 mt-1">Coming soon</span>
+          </Link>
+        </div>
+
+        {/* Status Card */}
+        <div className="bg-white rounded-lg border border-primary-200 p-4 sm:p-6 shadow-sm mb-6">
+          <h2 className="text-sm sm:text-base font-bold text-primary-900 mb-4 flex items-center gap-2">
+            <span>📊</span> Status
+          </h2>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-primary-50 rounded-lg">
+              <span className="text-xs sm:text-sm font-medium text-gray-700">Email</span>
+              <span className="text-xs sm:text-sm font-semibold text-primary-900 truncate ml-2">
+                {session.user?.email}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-blue-50 rounded-lg">
+              <span className="text-xs sm:text-sm font-medium text-gray-700">Role</span>
+              <span className="text-xs sm:text-sm font-semibold text-blue-900">
+                {session.user?.role === 'admin' ? 'Admin 👨‍💼' : 'User 👤'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Features Overview */}
+        <div className="bg-white rounded-lg border border-primary-100 p-4 sm:p-6 shadow-sm">
+          <h2 className="text-sm sm:text-base font-bold text-primary-900 mb-4 flex items-center gap-2">
+            <span>🎯</span> How It Works
+          </h2>
+
+          <div className="space-y-3 text-xs sm:text-sm text-gray-700">
+            <div className="flex gap-3">
+              <span className="font-bold text-primary-600 flex-shrink-0">1</span>
+              <p>
+                <strong>Mark Your Availability:</strong> Use the calendar to show which dates you can attend.
               </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-semibold mb-2">Your Info</h3>
-                  <p className="text-sm text-gray-600">Email: {session.user?.email}</p>
-                  <p className="text-sm text-gray-600">Username: {session.user?.username}</p>
-                  <p className="text-sm text-gray-600">
-                    Role: {session.user?.role === 'admin' ? 'Admin' : 'User'}
-                  </p>
-                </div>
-
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-semibold mb-2">Status</h3>
-                  <p className="text-sm text-gray-600">Phase 1a: Authentication</p>
-                  <p className="text-sm text-gray-600">You are successfully logged in</p>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <h3 className="font-semibold mb-3">Coming Soon</h3>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>- Calendar and Availability (Phase 1b)</li>
-                  <li>- Betting System (Phase 1c)</li>
-                  <li>- Results and Leaderboard (Phase 2)</li>
-                </ul>
-              </div>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-bold text-primary-600 flex-shrink-0">2</span>
+              <p>
+                <strong>Reach Consensus:</strong> When everyone marks the same date, it becomes available (shown in green).
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-bold text-primary-600 flex-shrink-0">3</span>
+              <p>
+                <strong>Admin Locks Date:</strong> Once consensus is reached, admin locks the final date.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-bold text-primary-600 flex-shrink-0">4</span>
+              <p>
+                <strong>Place Your Bets:</strong> After the date is locked, betting becomes available!
+              </p>
             </div>
           </div>
-        ) : (
-          <div className="text-center rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
-            <p className="text-lg text-gray-600 mb-6">You are not signed in. Please login or create an account.</p>
-            <div className="flex justify-center gap-4">
-              <Link
-                href="/auth/login"
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-              >
-                Sign Up
-              </Link>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

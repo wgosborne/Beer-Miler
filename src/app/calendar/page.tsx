@@ -163,42 +163,44 @@ export default function CalendarPage() {
   const month = currentMonth.getMonth() + 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-4 sm:py-8">
+      <div className="w-full max-w-3xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            📅 Beer Mile Calendar
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-900 mb-1">
+            📅 Calendar
           </h1>
-          <p className="text-gray-600">
-            Mark your availability and help us find a date that works for everyone!
+          <p className="text-sm sm:text-base text-gray-600">
+            Mark your availability for Annie's beer mile
           </p>
         </div>
 
         {/* Error message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            ❌ {error}
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm sm:text-base">
+            {error}
           </div>
         )}
 
         {/* Event status */}
         {eventData && (
-          <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg">
-            <p className="text-sm text-gray-600">
-              <strong>Event:</strong> {eventData.name}
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white border border-primary-200 rounded-lg">
+            <p className="text-xs sm:text-sm text-gray-700">
+              <strong className="text-primary-900">Event:</strong> {eventData.name}
               {eventData.scheduledDate ? (
-                <span className="ml-2 text-green-600 font-semibold">
-                  ✓ Scheduled for {new Date(eventData.scheduledDate).toLocaleDateString()}
+                <span className="block sm:inline sm:ml-2 text-primary-600 font-semibold mt-1 sm:mt-0">
+                  Locked for {new Date(eventData.scheduledDate).toLocaleDateString()}
                 </span>
               ) : (
-                <span className="ml-2 text-amber-600">Awaiting date consensus...</span>
+                <span className="block sm:inline sm:ml-2 text-amber-600 mt-1 sm:mt-0">
+                  Waiting for consensus...
+                </span>
               )}
             </p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Calendar */}
           <div className="lg:col-span-2">
             {calendarData && (
@@ -216,7 +218,7 @@ export default function CalendarPage() {
           </div>
 
           {/* Sidebar with admin panel or info */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {session.user.role === 'admin' && calendarData && (
               <AdminLockPanel
                 consensusDates={calendarData.consensusDates}
@@ -227,72 +229,65 @@ export default function CalendarPage() {
               />
             )}
 
-            {/* Info panel */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-bold mb-4 text-gray-900">How it Works</h3>
-              <div className="space-y-3 text-sm text-gray-700">
-                <p>
-                  <strong>1. Mark Availability:</strong> Click on dates to mark yourself as available or unavailable.
-                </p>
-                <p>
-                  <strong>2. Consensus Building:</strong> Green dates show when everyone is available.
-                </p>
-                <p>
-                  <strong>3. Admin Locks Date:</strong> Once consensus is reached, the admin locks the event date.
-                </p>
-                <p>
-                  <strong>4. Ready to Bet:</strong> After the date is locked, betting becomes available!
-                </p>
-              </div>
-            </div>
-
             {/* Your availability */}
             {calendarData && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-bold mb-4 text-gray-900">Your Availability</h3>
-                <div className="text-sm text-gray-700 space-y-2">
-                  <p>
-                    <strong className="text-green-600">Available:</strong>{' '}
-                    {Object.values(calendarData.userAvailability).filter((v) => v === true).length} dates
-                  </p>
-                  <p>
-                    <strong className="text-red-600">Unavailable:</strong>{' '}
-                    {Object.values(calendarData.userAvailability).filter((v) => v === false).length} dates
-                  </p>
-                  <p>
-                    <strong className="text-gray-600">Not Marked:</strong>{' '}
-                    {
-                      Object.values(calendarData.userAvailability).filter((v) => v === undefined)
-                        .length
-                    } dates
-                  </p>
+              <div className="bg-white rounded-lg border border-primary-200 p-4 sm:p-6 shadow-sm">
+                <h3 className="text-sm sm:text-base font-bold text-primary-900 mb-3 sm:mb-4 flex items-center gap-2">
+                  <span>✓</span> Your Status
+                </h3>
+                <div className="text-xs sm:text-sm text-gray-700 space-y-2 sm:space-y-3">
+                  <div className="flex justify-between p-2 bg-green-50 rounded">
+                    <span>Available:</span>
+                    <strong className="text-green-700">{Object.values(calendarData.userAvailability).filter((v) => v === true).length}</strong>
+                  </div>
+                  <div className="flex justify-between p-2 bg-red-50 rounded">
+                    <span>Unavailable:</span>
+                    <strong className="text-red-700">{Object.values(calendarData.userAvailability).filter((v) => v === false).length}</strong>
+                  </div>
+                  <div className="flex justify-between p-2 bg-gray-50 rounded">
+                    <span>Not marked:</span>
+                    <strong className="text-gray-700">{Object.values(calendarData.userAvailability).filter((v) => v === undefined).length}</strong>
+                  </div>
                 </div>
               </div>
             )}
+
+            {/* Info panel */}
+            <div className="bg-primary-50 rounded-lg border border-primary-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-sm sm:text-base font-bold text-primary-900 mb-3 sm:mb-4 flex items-center gap-2">
+                <span>🎯</span> How It Works
+              </h3>
+              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-700">
+                <p><strong>1. Mark:</strong> Click dates to show availability.</p>
+                <p><strong>2. Consensus:</strong> Green = everyone available.</p>
+                <p><strong>3. Lock:</strong> Admin locks the final date.</p>
+                <p><strong>4. Bet:</strong> Place your bets after lock.</p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <div className="mt-8 flex justify-between items-center">
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4">
           <button
             onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
           >
-            ← Previous Month
+            Previous
           </button>
 
           <button
             onClick={() => setCurrentMonth(new Date())}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
           >
             Today
           </button>
 
           <button
             onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
           >
-            Next Month →
+            Next
           </button>
         </div>
       </div>

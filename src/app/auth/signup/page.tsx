@@ -24,7 +24,6 @@ export default function SignupPage() {
       ...prev,
       [name]: value,
     }));
-    // Clear error for this field
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -96,7 +95,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Auto-sign in after signup
       const signInResult = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -106,7 +104,6 @@ export default function SignupPage() {
       if (signInResult?.ok) {
         router.push('/');
       } else {
-        // Signup succeeded but signin failed, redirect to login
         router.push('/auth/login?signup=success');
       }
     } catch (error) {
@@ -118,127 +115,138 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Join Annie's Beer Mile betting app
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary-50 to-white py-12 px-4 sm:px-6">
+      <div className="w-full max-w-sm space-y-6">
+        {/* Logo */}
+        <div className="text-center">
+          <div className="text-5xl mb-4">🍺</div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-900 mb-1">
+            Beer Mile
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600">
+            Create your account to join the betting app
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        {/* Form */}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* API Error */}
           {apiError && (
-            <div className="rounded-md bg-red-50 p-4">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm font-medium text-red-800">{apiError}</p>
             </div>
           )}
 
-          <div className="space-y-4">
-            {/* Username */}
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="username"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Choose a username"
-                value={formData.username}
-                onChange={handleChange}
-                disabled={isLoading}
-              />
-              {errors.username && <p className="mt-1 text-sm text-red-600">{errors.username}</p>}
-            </div>
-
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                disabled={isLoading}
-              />
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-            </div>
-
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="At least 8 characters with number and special character"
-                value={formData.password}
-                onChange={handleChange}
-                disabled={isLoading}
-              />
-              {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                disabled={isLoading}
-              />
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
-              )}
-            </div>
-          </div>
-
+          {/* Username */}
           <div>
-            <button
-              type="submit"
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1.5">
+              Username
+            </label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autoComplete="username"
+              required
+              placeholder="john_doe"
+              value={formData.username}
+              onChange={handleChange}
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Creating account...' : 'Sign up'}
-            </button>
+              className="w-full px-4 py-2.5 sm:py-3 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base placeholder-gray-400"
+            />
+            {errors.username && (
+              <p className="mt-1.5 text-sm text-red-600">{errors.username}</p>
+            )}
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
-                Sign in
-              </Link>
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+              Email Address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={isLoading}
+              className="w-full px-4 py-2.5 sm:py-3 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base placeholder-gray-400"
+            />
+            {errors.email && (
+              <p className="mt-1.5 text-sm text-red-600">{errors.email}</p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              disabled={isLoading}
+              className="w-full px-4 py-2.5 sm:py-3 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base placeholder-gray-400"
+            />
+            {errors.password && (
+              <p className="mt-1.5 text-sm text-red-600">{errors.password}</p>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              Min 8 chars, must include a number and special character
             </p>
           </div>
+
+          {/* Confirm Password */}
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              required
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              disabled={isLoading}
+              className="w-full px-4 py-2.5 sm:py-3 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base placeholder-gray-400"
+            />
+            {errors.confirmPassword && (
+              <p className="mt-1.5 text-sm text-red-600">{errors.confirmPassword}</p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-2.5 sm:py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm sm:text-base mt-6"
+          >
+            {isLoading ? 'Creating account...' : 'Create Account'}
+          </button>
         </form>
+
+        {/* Sign In Link */}
+        <div className="text-center">
+          <p className="text-xs sm:text-sm text-gray-600">
+            Already have an account?{' '}
+            <Link href="/auth/login" className="font-semibold text-primary-600 hover:text-primary-700">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

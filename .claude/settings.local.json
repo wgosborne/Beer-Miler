@@ -11,7 +11,12 @@
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
       "Bash(pkill:*)",
-      "Bash(cd C:\\\\\\\\Users\\\\\\\\wgosb\\\\\\\\source\\\\\\\\repos\\\\\\\\fun\\\\\\\\beer-mile && npx tsc --noEmit 2>&1:*)"
+      "Bash(cd C:\\\\\\\\Users\\\\\\\\wgosb\\\\\\\\source\\\\\\\\repos\\\\\\\\fun\\\\\\\\beer-mile && npx tsc --noEmit 2>&1:*)",
+      "Bash(dir:*)",
+      "Bash(tree:*)",
+      "Bash(npm test:*)",
+      "Bash(node:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
