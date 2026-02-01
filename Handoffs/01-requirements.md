@@ -48,12 +48,20 @@
 - Once locked:
   - No more availability changes allowed
   - System locks this date as the official beer mile date
-  - Cannot be changed unless admin explicitly resets
+  - Admin can unlock the date anytime to reopen availability marking (see unlock operation below)
+  - Bets remain in database if date is unlocked (admin responsibility to manage)
 - Notification to all users when date is locked
 
 **4. View Locked Date (All Users)**
 - Once locked, all users see the official event date prominently displayed
 - Locked status is clear (cannot be misunderstood as a suggestion)
+
+**5. Unlock Event Date (Admin Action - NEW)**
+- Admin can unlock a previously locked event date anytime without restrictions
+- Unlocking:
+  - Allows users to modify availability again
+  - Does NOT delete existing bets (admin responsibility to manage data consistency)
+  - Resets event to "unlocked" state to allow new consensus
 
 #### Business Rules
 - Consensus = ALL users available (no one out of town on that date)
@@ -72,9 +80,9 @@
 
 ---
 
-### Phase 2: Betting Features (Post-Date-Lock)
+### Phase 2: Betting Features
 
-**Trigger:** Betting features only become available after admin locks an event date in Phase 1.
+**Availability:** Users can place bets anytime, regardless of whether the event date is locked. The event date lock is not required for betting.
 
 #### Core Entity 1: Bet Type - Time-Based Betting
 
@@ -235,7 +243,7 @@
 ### Reliability
 - **Data Integrity:** Bets locked once placed (cannot be edited/deleted by user)
 - **Admin Overrides:** Admin can reset results if data entry error detected
-- **Consensus Lock:** Once event date locked, cannot be accidentally changed
+- **Consensus Lock:** Event date can be locked by admin for consensus; admin can also unlock anytime to reopen availability marking
 
 ### User Experience
 - **Clarity:** Green/Red calendar should be instantly understandable
@@ -364,10 +372,12 @@
 - All 8-12 users can mark availability for dates in a 3-month window
 - Calendar clearly shows which dates have full consensus (all green)
 - Admin can lock a consensus date
-- Locked date is immutable until explicitly reset by admin
-- Availability cannot be changed after lock
+- Admin can unlock a locked date to reopen availability marking
+- Locked date prevents availability changes until unlocked
+- Bets remain in database even if event is unlocked
 
 ### Phase 2 (Betting)
+- Users can place bets anytime (no event date lock required)
 - Users can place time over/under bets with clear confirmation
 - Users can input exact time guess with one guess per user
 - Users can place vomit yes/no bet with one bet per user

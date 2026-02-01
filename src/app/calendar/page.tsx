@@ -144,6 +144,34 @@ export default function CalendarPage() {
     }
   };
 
+  const handleUnlockDate = async () => {
+    try {
+      const res = await fetch('/api/admin/unlock-date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error?.message || 'Failed to unlock date');
+      }
+
+      // Refresh event data and calendar
+      const eventRes = await fetch('/api/event/current');
+      const evt = await eventRes.json();
+      setEventData(evt);
+
+      const monthStr = `${currentMonth.getFullYear()}-${String(
+        currentMonth.getMonth() + 1
+      ).padStart(2, '0')}`;
+      const calRes = await fetch(`/api/availability?month=${monthStr}`);
+      const cal = await calRes.json();
+      setCalendarData(cal);
+    } catch (err) {
+      throw err; // Let AdminLockPanel handle the error display
+    }
+  };
+
   if (status === 'loading' || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -225,6 +253,7 @@ export default function CalendarPage() {
                 eventLocked={calendarData.eventLocked}
                 lockedDate={eventData?.scheduledDate}
                 onLockDate={handleLockDate}
+                onUnlockDate={handleUnlockDate}
                 loading={loading}
               />
             )}

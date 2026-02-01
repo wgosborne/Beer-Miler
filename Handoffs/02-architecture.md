@@ -520,6 +520,39 @@ Admin locks a consensus date as the official event date.
 
 ---
 
+#### POST `/api/admin/unlock-date`
+Admin unlocks a previously locked event date, allowing users to modify availability again.
+
+**Request:**
+```json
+{}
+```
+
+**Validation Rules:**
+- User must be admin (role === "admin")
+- Event must be currently locked (scheduledDate !== null)
+
+**Response (200):**
+```json
+{
+  "eventId": "event-456",
+  "message": "Event date unlocked successfully. Users can now update availability."
+}
+```
+
+**Error Responses:**
+- 401: Not authenticated
+- 403: User is not admin
+- 404: Event not found
+- 400: Event is not currently locked
+
+**Important Notes:**
+- Unlocking does NOT delete existing bets (admin responsibility to manage data consistency)
+- Users can update availability after unlock
+- Admin can re-lock on the same or different date after unlocking
+
+---
+
 ### Phase 2: Betting Endpoints
 
 #### POST `/api/bets`
@@ -551,9 +584,9 @@ Place a bet. Request shape varies by bet type.
 ```
 
 **Validation Rules:**
-- Event must be locked (scheduled date set)
-- Results must NOT be finalized
+- Results must NOT be finalized (no bets allowed once results are final)
 - User must be authenticated
+- Event date lock is NOT required (users can bet anytime)
 - For exact_time_guess: Only one per user per event (update replaces previous)
 - For vomit_prop: Only one per user per event (update replaces previous)
 - For time_over_under: Can place multiple (different thresholds)
@@ -579,7 +612,6 @@ Place a bet. Request shape varies by bet type.
 - 400: Invalid bet data
 - 401: Not authenticated
 - 409: Results already finalized OR bet type constraint violated (e.g., already has exact guess)
-- 422: Event not locked yet
 
 ---
 
@@ -620,13 +652,11 @@ Get all bets for the current event (with distribution view).
       "360_over": 5,  // 5 people bet over 6 min
       "360_under": 7  // 7 people bet under 6 min
     },
-    "exact_time_guess": {
-      "guesses": [
-        { "time": 320, "user": "alice" },
-        { "time": 347, "user": "bob" },
-        { "time": 360, "user": "charlie" }
-      ]
-    },
+    "exact_time_guess": [
+      { "time": 320, "user": "alice" },
+      { "time": 347, "user": "bob" },
+      { "time": 360, "user": "charlie" }
+    ],
     "vomit_prop": {
       "yes": 6,
       "no": 6
@@ -643,7 +673,6 @@ Delete a pending bet (before results finalize).
 **Validation Rules:**
 - User must own the bet
 - Results must NOT be finalized
-- Event must be locked
 
 **Response (204):** No content
 
@@ -1219,6 +1248,7 @@ export const config = {
 | GET /api/availability | No | Yes | No |
 | POST /api/availability | No | Yes | No |
 | POST /api/admin/lock-date | Yes | Yes | No |
+| POST /api/admin/unlock-date | Yes | Yes | No |
 | POST /api/bets | No | Yes | No |
 | GET /api/bets | No | Yes | No |
 | POST /api/admin/results | Yes | Yes | No |
@@ -1236,7 +1266,8 @@ export const config = {
 - 3-month calendar with color-coded availability
 - Mark dates as available/unavailable
 - Admin lock consensus date
-- Event locked notification
+- Admin unlock date (reopen availability marking)
+- Event locked/unlocked notification
 
 **Database:**
 - Users table
@@ -1251,6 +1282,7 @@ export const config = {
 - GET /api/availability
 - POST /api/availability
 - POST /api/admin/lock-date
+- POST /api/admin/unlock-date
 
 **Frontend Pages:**
 - /auth/login
@@ -1261,41 +1293,27 @@ export const config = {
 **Testing Focus:**
 - Availability toggling logic
 - Consensus calculation (all available)
-- Lock prevents further changes
+- Lock prevents availability changes until unlocked
+- Unlock reopens availability marking
 - 3-month window rolling logic
 
 **Success Criteria:**
 - 8-12 users can mark availability
 - Calendar clearly shows GREEN (consensus) and RED (conflicts)
-- Admin can lock date immutably
-- Locked state persists
+- Admin can lock date (prevents availability changes)
+- Admin can unlock date (reopens availability marking)
+- Bets remain in database even if date is unlocked
 
 **Deployment:** Full Phase 1 MVP deployed to Render. Users can use calendar feature standalone.
 
 ---
 
-### Phase 1 → Phase 2 Gate
+### Phase 1 & Phase 2 Integration
 
-**Before Phase 2 can be used:**
-- Event must be locked (scheduledDate is not null)
-- If trying to access /betting and event not locked, show message and redirect to /calendar
-
-```typescript
-// Middleware check
-if (req.nextUrl.pathname.includes("/betting")) {
-  const event = await prisma.event.findFirst({
-    where: { id: process.env.EVENT_ID }
-  });
-
-  if (!event?.scheduledDate) {
-    return NextResponse.redirect(
-      new URL("/calendar?message=Lock%20date%20first", req.url)
-    );
-  }
-}
-```
-
----
+**No Gate Between Phases:**
+- Phase 2 (betting) is independent of Phase 1 (calendar)
+- Users can place bets anytime, whether or not the event date is locked
+- Event date lock is optional and does not gate betting access
 
 ### Phase 2: Betting Features (Builds on Phase 1)
 
@@ -1328,12 +1346,13 @@ if (req.nextUrl.pathname.includes("/betting")) {
 - /leaderboard (main leaderboard page)
 
 **Testing Focus:**
-- Bet placement validation
+- Bet placement validation (anytime, no event lock required)
 - Scoring logic for each bet type
 - Tie-breaking (both users get point)
 - Leaderboard ranking
 - Results finalization idempotency
 - Reset results functionality
+- Bet distribution display (exact_time_guess as array)
 
 **Success Criteria:**
 - Users can place bets in multiple formats
@@ -1357,7 +1376,55 @@ if (req.nextUrl.pathname.includes("/betting")) {
 
 ---
 
-## 8. Deployment on Render
+## 8. Recent Implementation Changes & Bug Fixes
+
+### Feature: Admin Unlock Date (January 2026)
+**Location:** `src/app/api/admin/unlock-date/route.ts` and `src/components/AdminLockPanel.tsx`
+
+**Description:** Admins can now unlock a previously locked event date anytime without restrictions.
+- **Endpoint:** POST `/api/admin/unlock-date`
+- **Effect:** Resets `scheduledDate` and `lockedAt` to null in database
+- **Bet Handling:** Bets remain in database (admin responsibility for data consistency)
+- **User Impact:** Users can modify availability again after unlock
+- **Authorization:** Admin role only
+
+**Implementation Details:**
+- No validation on existing bets or results
+- Can re-lock date on same or different consensus date after unlocking
+- UI shows red "Unlock Date" button with warning when date is locked
+
+### Feature: Betting Available Anytime (January 2026)
+**Location:** `src/app/api/bets/route.ts`
+
+**Description:** Users can place bets anytime, regardless of event date lock status.
+- **Change:** Removed `event.scheduledDate` validation from POST /api/bets
+- **Validation Kept:** Only checks `event.resultsFinalized` to prevent bets after results lock
+- **User Impact:** Betting access no longer gated by event date selection
+- **Admin Benefit:** More flexibility in scheduling vs betting phases
+
+**Implementation Details:**
+- Event lock is optional for event coordination
+- Betting phase is independent of calendar phase
+- No middleware redirects for /betting route
+
+### Bug Fix: BetDistribution Exact Time Guesses (January 2026)
+**Location:** `src/app/api/bets/route.ts` and `src/components/BetDistribution.tsx`
+
+**Problem:** `exact_time_guess` was returned as `{ guesses: [...] }` but component expected direct array
+
+**Solution:**
+- Changed API response format from object with nested array to direct array
+- Before: `exact_time_guess: { guesses: [ { time, user } ] }`
+- After: `exact_time_guess: [ { time, user } ]`
+- Array remains sorted by time (ascending)
+
+**Files Changed:**
+- `calculateDistribution()` function in route.ts
+- Component already expected correct format
+
+---
+
+## 9. Deployment on Render
 
 ### Environment Variables (.env.local)
 
@@ -1454,7 +1521,7 @@ main().catch(console.error);
 
 ---
 
-## 9. Error Handling & Validation
+## 10. Error Handling & Validation
 
 ### Input Validation Strategy
 
@@ -1691,7 +1758,7 @@ export const BetForm = ({ betType, onSubmit }) => {
 
 ---
 
-## 10. Future Extensibility (Phase 3+)
+## 11. Future Extensibility (Phase 3+)
 
 ### Adding New Bet Types
 
@@ -1838,7 +1905,7 @@ export default async function BettingPage({
 
 ---
 
-## 11. Development Setup
+## 12. Development Setup
 
 ### Prerequisites
 
@@ -2052,7 +2119,7 @@ DEBUG="next-auth:*"
 
 ---
 
-## 12. Security Considerations
+## 13. Security Considerations
 
 ### Input Validation
 - All API inputs validated with Zod before processing

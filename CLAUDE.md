@@ -4,7 +4,7 @@ A friendly betting application for a 8-12 person friend group to place wagers on
 
 ## Current Phase
 
-**Phase 1 Complete** (Calendar & Availability) → Phase 2 ready (Betting System)
+**Phase 1 & 2 Complete** (Calendar, Availability, Betting, Results, Leaderboard). Ready for testing and production deployment.
 
 ## Tech Stack
 
@@ -19,10 +19,10 @@ A friendly betting application for a 8-12 person friend group to place wagers on
 
 ## Core Entities
 
-- **Users**: 8-12 friend group members with email/username login. Roles: admin (locks date, enters results) or user (marks availability, places bets).
-- **Event**: Single beer mile event (extensible to multiple future events). Tracks scheduled date (locked by admin), final time, and vomit outcome.
-- **Availability**: User availability per date (3-month rolling window). Day-level granularity only; users mark themselves as "out of town" on unavailable dates.
-- **Bets** (Phase 2): Three types—time over/under (multiple per user), exact time guess (one per user), vomit prop (one per user). Points: 1 per winning bet.
+- **Users**: 8-12 friend group members with email/username login. Roles: admin (locks/unlocks date, enters results) or user (marks availability, places bets).
+- **Event**: Single beer mile event. Tracks scheduled date (lockable by admin), final time, vomit outcome, results finalization status.
+- **Availability**: User availability per date (3-month rolling window). Locked dates prevent changes until unlocked by admin.
+- **Bets**: Three types—time over/under (multiple per user), exact time guess (one per user), vomit prop (one per user). Points: 1 per winning bet. Anytime placement (no event lock gate).
 - **Leaderboard**: Cumulative points per user, refreshed after results finalize.
 
 ## API Endpoints (Summary)
@@ -35,23 +35,27 @@ A friendly betting application for a 8-12 person friend group to place wagers on
 | GET | /api/availability?month=YYYY-MM | Get calendar data & consensus dates |
 | POST | /api/availability | Mark dates available/unavailable |
 | POST | /api/admin/lock-date | Lock consensus date (admin only) |
-| POST | /api/bets | Place bet |
+| POST | /api/admin/unlock-date | Unlock date to reopen availability (admin only) |
+| POST | /api/bets | Place bet (anytime) |
 | GET | /api/bets | View bets & distribution |
 | POST | /api/admin/results | Enter final time & vomit outcome (admin only) |
 | POST | /api/admin/finalize-results | Lock results (admin only) |
+| POST | /api/admin/reset-results | Reset results before finalization (admin only) |
 | GET | /api/leaderboard | View rankings |
 
 *Full API docs in `/Handoffs/02-architecture.md`*
 
-## Key Decisions
+## Key Decisions & Recent Changes
 
-- **Next.js monolith**: Single deployment (no separate frontend/backend). Eliminates CORS, simplifies operations for a friend-group project.
-- **Neon + Render**: PostgreSQL on serverless. Auto-scaling, pay-per-use, perfect for small user base.
-- **Consensus = all available**: Phase 1 locks event only when 100% of users show availability on that date. No majority rule.
-- **Tie-breaking**: If two users guess equally close to final time, both get 1 point (fairness).
-- **Bet locking**: Once placed, bets cannot be edited or deleted (immutable). Only admin can reset all results if data entry error.
-- **Phase gating**: Phase 2 (betting) only available after admin locks event date in Phase 1.
-- **JSON bet storage**: Flexible `betData` JSONB column in `bets` table allows adding new bet types (Phase 3+) without schema changes.
+- **Next.js monolith**: Single deployment (no separate frontend/backend). Eliminates CORS, simplifies operations.
+- **Neon + Render**: PostgreSQL serverless. Auto-scaling, pay-per-use, perfect for small user base.
+- **Unlock date feature** (NEW): Admin can unlock a previously locked event date anytime without restrictions. Users can then modify availability again. Bets remain in database (admin responsibility to manage consistency).
+- **Betting independent of lock** (NEW): Users can place bets anytime, regardless of event date lock status. No event lock gate.
+- **Consensus = all available**: Lock only when 100% of users show availability. No majority rule.
+- **Tie-breaking**: If two users guess equally close, both get 1 point (fairness).
+- **Bet immutability**: Once placed, bets cannot be edited or deleted. Admin can reset all results if data entry error.
+- **BetDistribution fixed** (NEW): Exact time guesses now return as direct array (not nested object).
+- **JSON bet storage**: Flexible `betData` JSONB column allows new bet types (Phase 3+) without schema changes.
 
 ## How to Run
 
@@ -61,110 +65,109 @@ A friendly betting application for a 8-12 person friend group to place wagers on
 # Install dependencies
 npm install
 
-# Create .env.local (see below)
-NEXTAUTH_SECRET="$(openssl rand -base64 32)"  # Generate a secret
-# DATABASE_URL from Neon (or local PostgreSQL)
-# NEXTAUTH_URL="http://localhost:3000"
+# Create .env.local
+NEXTAUTH_SECRET="$(openssl rand -base64 32)"
+DATABASE_URL="postgresql://user:password@localhost:5432/beer_mile_dev"  # or Neon URL
+NEXTAUTH_URL="http://localhost:3000"
+EVENT_ID="event-1"
 
 # Set up database
 npx prisma migrate dev --name init
 
-# Seed with test data (admin user)
+# Seed with test data
 npx prisma db seed
 
 # Start dev server
 npm run dev
 ```
 
-Visit `http://localhost:3000` in browser. Login with `admin@beer-mile.test` / `admin123` to test admin functions.
-
-### Database Setup (First Time)
-
-```bash
-# Option A: Local PostgreSQL
-createdb beer_mile_dev
-DATABASE_URL="postgresql://user:password@localhost:5432/beer_mile_dev"
-
-# Option B: Neon (recommended)
-# Create Neon project, copy DATABASE_URL, paste in .env.local
-
-# Run migrations (both options)
-npx prisma migrate dev --name init
-npx prisma db seed  # Creates admin user + initial event
-```
+Login at `http://localhost:3000` with `admin@beer-mile.test` / `admin123`.
 
 ### Deployment to Render
 
-1. **Connect GitHub repo** to Render.com
-2. **Set environment variables** in Render dashboard:
+1. Connect GitHub repo to Render.com
+2. Set environment variables:
    - `DATABASE_URL` (from Neon)
    - `NEXTAUTH_SECRET` (generate: `openssl rand -base64 32`)
-   - `NEXTAUTH_URL` (your Render domain, e.g., https://beer-mile.render.com)
-3. **Build/Start commands**:
-   ```
-   Build: npm run build
-   Start: npm run start
-   ```
-4. **Auto-deploys** on git push to main branch
+   - `NEXTAUTH_URL` (your Render domain)
+   - `EVENT_ID` (e.g., "event-1")
+3. Build: `npm run build` | Start: `npm run start`
+4. Auto-deploys on git push to main branch
 
 ## Current Status
 
-- [x] Requirements & architecture documented
-- [x] **Phase 1 Complete**: Calendar UI, availability tracking, admin lock-date
-- [ ] **Testing Phase 1**: Unit & integration tests
-- [ ] **Implementation (Phase 2)**: Betting system, results, leaderboard
-- [ ] **Testing Phase 2**: Scoring logic, edge cases
-- [ ] **Production Deployment**: Render setup, migrations, seed data
+- [x] Phase 1: Calendar, availability, lock/unlock date
+- [x] Phase 2: Betting system (3 types), results, leaderboard
+- [x] API endpoints: All core endpoints implemented
+- [x] Admin unlock-date: Fully functional
+- [x] Betting gates: Removed (no event lock required)
+- [x] BetDistribution: Fixed exact_time_guess array format
+- [ ] **Testing**: Unit & integration tests needed
+- [ ] **Production**: Ready for Render deployment
 
 ## Next Steps
 
-1. **Test Phase 1**: Write unit & integration tests for calendar logic
-2. **Implement Phase 2**:
-   - Add Bet and LeaderboardEntry tables
-   - Build bet placement UI (3 bet types)
-   - Build admin results form & scoring logic
-   - Build leaderboard display
-3. **Test Phase 2**: Verify scoring edge cases and consensus logic
-4. **Deploy to Production**: Push to Render with database migrations
+1. Write unit tests for scoring logic (tie-breaking, exact time matching, vomit prop)
+2. Write integration tests for bet placement & results calculation
+3. Write component tests for Calendar, BetForm, Leaderboard
+4. Deploy to Render with Neon database
+5. User acceptance testing with full group
 
-## Open Questions / Notes
+## Implementation Notes
 
-- **Tie-breaking**: Currently set to "both get 1 point" if equally close guesses. Clarify with user if needed.
-- **Timezone**: All dates treated as local to event location (ISO format YYYY-MM-DD).
-- **Future events**: Schema supports multiple events; Phase 1 MVP focuses on one event (stored as singleton in environment).
-- **Email notifications**: Low priority for MVP (no notification system yet).
-- **Admin delegation**: If primary admin unavailable, another user cannot assume admin role (design choice for simplicity).
+- **Unlock logic**: Resets `scheduledDate` and `lockedAt` to null. Bets NOT deleted (admin decision).
+- **Betting anytime**: No check on event lock status in POST /api/bets. Only checks results finalization.
+- **Exact time guesses**: Returns as sorted array `[{time, user}, ...]` in distribution (fixed from nested structure).
+- **Bet placement**: When replacing exact_time_guess or vomit_prop, old bet is deleted, new one created (idempotent).
+- **Results flow**: POST /api/admin/results (preview) → POST /api/admin/finalize-results (commit) → leaderboard locked.
 
 ## Key Constraints & Assumptions
 
-- **No real-time**: Event doesn't track live lap times (admin manually enters final time).
-- **No payments**: Bragging rights only. Keeps it simple and fun.
+- **No real-time**: Admin manually enters final time via UI (no video analysis).
+- **No payments**: Bragging rights only. Legally simple and fun.
 - **Friend group only**: Private access, no public signup or community features.
-- **Small scale**: Designed for 8-12 users; not building for massive scale.
-- **Consensus required**: All users must be available on selected date (no relaxed constraints in Phase 1).
+- **Small scale**: 8-12 users; not building for massive scale.
+- **Single event**: MVP supports one event (schema extensible for multiple future events).
+- **Admin trusted**: Admin responsibility to ensure data consistency if unlocking event with existing bets.
+
+## Testing Checklist
+
+- [ ] Calendar consensus calculation (all users = GREEN)
+- [ ] Lock date prevents availability updates
+- [ ] Unlock date reopens availability, preserves bets
+- [ ] Place bet: time_over_under (multiple allowed)
+- [ ] Place bet: exact_time_guess (one per user, updates replace old)
+- [ ] Place bet: vomit_prop (one per user, updates replace old)
+- [ ] Bet distribution display (exact_time_guess as array)
+- [ ] Results preview before finalization
+- [ ] Scoring: exact_time_guess winner (closest guess gets point, ties get both)
+- [ ] Scoring: time_over_under (over/under against final time)
+- [ ] Scoring: vomit_prop (yes/no match)
+- [ ] Leaderboard ranks by total points
+- [ ] Results finalized blocks new bets
+- [ ] Reset results (before finalize) returns all bets to pending
 
 ## Links
 
-- **Requirements**: `/Handoffs/01-requirements.md` (full functional spec, data model, edge cases)
-- **Architecture**: `/Handoffs/02-architecture.md` (tech stack, schema, API details, component hierarchy, deployment)
-- **Project Root**: This file (`CLAUDE.md`) is the single source of truth for project status
+- **Requirements**: `/Handoffs/01-requirements.md` (functional spec, data model, edge cases)
+- **Architecture**: `/Handoffs/02-architecture.md` (tech stack, schema, API details, deployment)
 
 ## Development Commands
 
 ```bash
-npm run dev              # Start dev server (localhost:3000)
+npm run dev              # Start dev server
 npm run build            # Build for production
 npm run start            # Start production server
 npm run test             # Run tests
-npm run test:watch      # Tests in watch mode
-npm run lint             # Run linter
-npm run db:studio       # Open Prisma Studio GUI
-npx prisma migrate dev   # Create new migration
-npx prisma generate     # Regenerate Prisma client
+npm run test:watch      # Watch mode
+npm run lint             # Lint code
+npm run db:studio       # Open Prisma GUI
+npx prisma migrate dev   # Create migration
+npx prisma generate     # Regenerate client
 ```
 
 ---
 
 **Last Updated**: 2026-01-31
+**Status**: Phase 1 & 2 Complete, Ready for Testing
 **Owner**: Friend group (8-12 people)
-**Contact**: Admin contact needed for deployment credentials

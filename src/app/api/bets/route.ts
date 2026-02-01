@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Check event exists and is locked
+    // 4. Check event exists
     const event = await prisma.event.findUnique({
       where: { id: eventId },
     });
@@ -62,21 +62,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. Check event date is locked
-    if (!event.scheduledDate) {
-      return NextResponse.json(
-        {
-          error: {
-            code: 'CONFLICT',
-            message: 'Event date must be locked before placing bets',
-            statusCode: 409,
-          },
-        },
-        { status: 409 }
-      );
-    }
-
-    // 6. Check results not finalized
+    // 5. Check results not finalized
     if (event.resultsFinalized) {
       return NextResponse.json(
         {
@@ -90,7 +76,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 7. Enforce uniqueness for single-bet-per-user types
+    // 6. Enforce uniqueness for single-bet-per-user types
     if (validatedData.betType === 'exact_time_guess') {
       const existing = await prisma.bet.findFirst({
         where: {
@@ -119,7 +105,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 8. Create bet
+    // 7. Create bet
     const bet = await prisma.bet.create({
       data: {
         userId: session.user.id,
@@ -133,7 +119,7 @@ export async function POST(req: NextRequest) {
 
     console.log(`[Bets API] User ${session.user.id} placed ${validatedData.betType} bet`);
 
-    // 9. Return success
+    // 8. Return success
     return NextResponse.json(bet, { status: 201 });
   } catch (error) {
     // Handle Zod validation errors
@@ -274,7 +260,7 @@ interface BetWithUser {
 function calculateDistribution(bets: BetWithUser[]) {
   const distribution: any = {
     time_over_under: {},
-    exact_time_guess: { guesses: [] },
+    exact_time_guess: [],
     vomit_prop: { yes: 0, no: 0 },
   };
 
@@ -284,7 +270,7 @@ function calculateDistribution(bets: BetWithUser[]) {
       const key = `${thresholdSeconds}_${direction}`;
       distribution.time_over_under[key] = (distribution.time_over_under[key] || 0) + 1;
     } else if (bet.betType === 'exact_time_guess') {
-      distribution.exact_time_guess.guesses.push({
+      distribution.exact_time_guess.push({
         time: bet.betData.guessedTimeSeconds,
         user: bet.user.username,
       });
@@ -299,7 +285,7 @@ function calculateDistribution(bets: BetWithUser[]) {
   }
 
   // Sort guesses by time
-  distribution.exact_time_guess.guesses.sort((a: any, b: any) => a.time - b.time);
+  distribution.exact_time_guess.sort((a: any, b: any) => a.time - b.time);
 
   return distribution;
 }

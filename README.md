@@ -4,9 +4,9 @@ A friend-group betting app to wager on Annie's beer mile. Place bets on finish t
 
 ## How It Works
 
-**Phase 1 (Calendar)**: Mark availability on a 3-month calendar. When everyone's available on the same date, admin locks it.
+**Phase 1 (Calendar)**: Mark availability on a 3-month calendar. When everyone's available on the same date, admin locks it. Admin can also unlock the date anytime to reopen availability marking.
 
-**Phase 2 (Betting)**: Once locked, place bets on:
+**Phase 2 (Betting)**: Anytime, place bets on:
 - Time Over/Under (multiple allowed)
 - Exact time guess (one per person)
 - Vomit prop (one per person)
@@ -77,8 +77,8 @@ npm run db:studio       # Open Prisma GUI
 
 ## Phases
 
-**Phase 1** (Complete): Calendar, availability consensus, admin lock-date
-**Phase 2** (Coming): Betting, results, leaderboard, scoring
+**Phase 1** (Complete): Calendar, availability consensus, admin lock/unlock-date
+**Phase 2** (Complete): Betting (anytime), results, leaderboard, scoring
 
 ## Deployment
 
@@ -96,7 +96,7 @@ npm run db:studio       # Open Prisma GUI
 
 ## Features
 
-**Calendar**: Mark availability, see consensus dates (green = all available), admin locks event date
+**Calendar**: Mark availability, see consensus dates (green = all available), admin locks/unlocks event date
 
 **Betting** (Phase 2): Time over/under, exact time guess, vomit prop. Auto-scoring with point awards.
 
@@ -114,9 +114,10 @@ npx tsc --noEmit        # Type check
 ## Key Design Decisions
 
 - All users must be available on same date (100% consensus)
+- Betting available anytime (no event lock required)
 - Bets are immutable once placed
 - Tie-breaking awards both users 1 point
-- Phase 2 locked until Phase 1 consensus reached
+- Admin can unlock event date anytime (bets remain in database)
 - Admin can reset results before finalization
 
 See `/Handoffs/` docs for full technical details.
@@ -134,4 +135,4 @@ Friend group project. Use, modify, and enjoy!
 ---
 
 **Last Updated**: 2026-01-31
-**Current Phase**: Phase 1 Complete • Phase 2 Ready
+**Current Phase**: Phase 1 & 2 Complete • Ready for Testing & Deployment
