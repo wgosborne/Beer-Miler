@@ -1,61 +1,55 @@
 # Annie's Beer Mile Betting App
 
-A friendly betting application for a 8-12 person friend group to place wagers on Annie's beer mile performance. No monetary transactions—just points and bragging rights.
+Friendly betting app for 8-12 person friend group. Three bet types, scoring system, leaderboard. No money—just points and bragging rights.
 
-## Current Phase
+## Current Status
 
-**Phase 1 & 2 Complete** (Calendar, Availability, Betting, Results, Leaderboard). Ready for testing and production deployment.
+**Phase 1 Complete**: Auth + Calendar + Betting + Scoring + Leaderboard. Code complete, tested (186 passing tests), design finalized (dark theme). Ready for production deployment to Render.
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14+ (React) with SSR/SSG
-- **Backend**: Next.js API Routes (colocated)
-- **Database**: Neon PostgreSQL (managed, serverless)
-- **ORM**: Prisma (type-safe queries, migrations)
-- **Auth**: NextAuth.js (email/username credentials)
-- **Styling**: Tailwind CSS
-- **Testing**: Jest + React Testing Library
-- **Hosting**: Render.com (native Next.js support, auto-deploys on git push)
+| Component | Choice |
+|-----------|--------|
+| Frontend | Next.js 14 (React, SSR) |
+| Backend | Next.js API Routes |
+| Database | Neon PostgreSQL (serverless) |
+| ORM | Prisma (type-safe) |
+| Auth | NextAuth.js (JWT, bcrypt) |
+| Styling | Tailwind CSS (dark theme) |
+| Hosting | Render.com (auto-deploys on git) |
+
+## Features Implemented
+
+1. **Auth** (Phase 1a): Signup/login with JWT sessions, bcrypt hashing, role-based access
+2. **Calendar** (Phase 1b): 3-month rolling window, consensus calculation (all users available = green), admin lock/unlock date
+3. **Betting** (Phase 1c): Three bet types (time over/under, exact time guess, vomit prop), anytime placement (no event lock gate)
+4. **Scoring**: Over/under threshold comparison, distance calculation with tie-breaking, vomit yes/no matching
+5. **Admin**: Results form with MM:SS input, preview before finalize, reset before finalization
+6. **Leaderboard**: Ranked by total points, detailed bet breakdown, expandable details
 
 ## Core Entities
 
-- **Users**: 8-12 friend group members with email/username login. Roles: admin (locks/unlocks date, enters results) or user (marks availability, places bets).
-- **Event**: Single beer mile event. Tracks scheduled date (lockable by admin), final time, vomit outcome, results finalization status.
-- **Availability**: User availability per date (3-month rolling window). Locked dates prevent changes until unlocked by admin.
-- **Bets**: Three types—time over/under (multiple per user), exact time guess (one per user), vomit prop (one per user). Points: 1 per winning bet. Anytime placement (no event lock gate).
-- **Leaderboard**: Cumulative points per user, refreshed after results finalize.
+- **Users**: Email/username login, roles (admin/user), all users participate in betting
+- **Event**: One per MVP, tracks scheduled date, final time, vomit outcome, results finalized flag
+- **Availability**: User per date per 3-month window. Locked dates immutable until admin unlocks.
+- **Bets**: JSON `betData` column supports flexible types. Exact guess & vomit prop = 1 per user (replaces old). Time over/under = unlimited.
+- **Leaderboard**: Denormalized, refreshed after finalization (fast queries)
 
-## API Endpoints (Summary)
+## API Endpoints
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| POST | /api/auth/signup | Create account |
-| POST | /api/auth/login | Authenticate |
-| GET | /api/event/current | Current event status |
-| GET | /api/availability?month=YYYY-MM | Get calendar data & consensus dates |
-| POST | /api/availability | Mark dates available/unavailable |
-| POST | /api/admin/lock-date | Lock consensus date (admin only) |
-| POST | /api/admin/unlock-date | Unlock date to reopen availability (admin only) |
-| POST | /api/bets | Place bet (anytime) |
-| GET | /api/bets | View bets & distribution |
-| POST | /api/admin/results | Enter final time & vomit outcome (admin only) |
-| POST | /api/admin/finalize-results | Lock results (admin only) |
-| POST | /api/admin/reset-results | Reset results before finalization (admin only) |
-| GET | /api/leaderboard | View rankings |
+15 total endpoints: auth (3), event (1), availability (2), bets (3), admin (4), leaderboard (1). All authenticated except signup/login. Validation with Zod, error handling with status codes.
 
-*Full API docs in `/Handoffs/02-architecture.md`*
+See `/Handoffs/02-architecture.md` for complete API spec.
 
-## Key Decisions & Recent Changes
+## Key Design Decisions
 
-- **Next.js monolith**: Single deployment (no separate frontend/backend). Eliminates CORS, simplifies operations.
-- **Neon + Render**: PostgreSQL serverless. Auto-scaling, pay-per-use, perfect for small user base.
-- **Unlock date feature** (NEW): Admin can unlock a previously locked event date anytime without restrictions. Users can then modify availability again. Bets remain in database (admin responsibility to manage consistency).
-- **Betting independent of lock** (NEW): Users can place bets anytime, regardless of event date lock status. No event lock gate.
-- **Consensus = all available**: Lock only when 100% of users show availability. No majority rule.
-- **Tie-breaking**: If two users guess equally close, both get 1 point (fairness).
-- **Bet immutability**: Once placed, bets cannot be edited or deleted. Admin can reset all results if data entry error.
-- **BetDistribution fixed** (NEW): Exact time guesses now return as direct array (not nested object).
-- **JSON bet storage**: Flexible `betData` JSONB column allows new bet types (Phase 3+) without schema changes.
+- **Single Next.js deployment**: Frontend + backend colocated. No separate services, no CORS.
+- **Neon + Render**: Serverless PostgreSQL + simple hosting. Perfect for 8-12 users.
+- **Unlock date anytime**: Admin can unlock event date at any point. Bets remain (admin responsibility).
+- **Betting independent**: Users can bet anytime, no event lock gate. Betting phase separate from scheduling.
+- **Consensus = 100%**: All users must be available to mark date as consensus (no majority).
+- **Tie-breaking**: Both users get 1 point if equally close (fairness over winner-take-all).
+- **JSON betData**: Flexible column supports new bet types (Phase 3+) without schema migration.
 
 ## How to Run
 
@@ -94,80 +88,56 @@ Login at `http://localhost:3000` with `admin@beer-mile.test` / `admin123`.
 3. Build: `npm run build` | Start: `npm run start`
 4. Auto-deploys on git push to main branch
 
-## Current Status
+## Checklist
 
-- [x] Phase 1: Calendar, availability, lock/unlock date
-- [x] Phase 2: Betting system (3 types), results, leaderboard
-- [x] API endpoints: All core endpoints implemented
-- [x] Admin unlock-date: Fully functional
-- [x] Betting gates: Removed (no event lock required)
-- [x] BetDistribution: Fixed exact_time_guess array format
-- [ ] **Testing**: Unit & integration tests needed
-- [ ] **Production**: Ready for Render deployment
+**Code Complete:**
+- [x] Auth (signup/login/logout with JWT)
+- [x] Calendar (3-month consensus, lock/unlock)
+- [x] Betting (3 bet types, placement, validation)
+- [x] Scoring (tie-breaking, distance calc)
+- [x] Admin (results form, preview, finalize, reset)
+- [x] Leaderboard (ranking, breakdown)
+
+**Testing:**
+- [x] 186 unit/integration tests passing
+- [x] Auth, validation, calendar, availability, scoring
+
+**Design:**
+- [x] Dark theme (black, purple/blue accents)
+- [x] Mobile-first (iPhone 414px base)
+- [x] Auth carousel with neon subtitle glow
+- [x] Responsive pages (home, calendar, betting, results, leaderboard)
+
+**Production Ready:**
+- [x] Environment setup (.env.local)
+- [x] Database schema (Prisma, 5 tables)
+- [x] Error handling & validation
+- [x] TypeScript strict mode
+- [ ] Deploy to Render (ready, waiting for user)
 
 ## Next Steps
 
-1. Write unit tests for scoring logic (tie-breaking, exact time matching, vomit prop)
-2. Write integration tests for bet placement & results calculation
-3. Write component tests for Calendar, BetForm, Leaderboard
-4. Deploy to Render with Neon database
-5. User acceptance testing with full group
+1. Deploy to Render.com (connect GitHub repo, set env vars, auto-deploys on push)
+2. Optional: Add Annie images to `public/images/annie/`
+3. User acceptance testing with full group
+4. Phase 3: Notifications, badges, advanced features
 
 ## Implementation Notes
 
-- **Unlock logic**: Resets `scheduledDate` and `lockedAt` to null. Bets NOT deleted (admin decision).
-- **Betting anytime**: No check on event lock status in POST /api/bets. Only checks results finalization.
-- **Exact time guesses**: Returns as sorted array `[{time, user}, ...]` in distribution (fixed from nested structure).
-- **Bet placement**: When replacing exact_time_guess or vomit_prop, old bet is deleted, new one created (idempotent).
-- **Results flow**: POST /api/admin/results (preview) → POST /api/admin/finalize-results (commit) → leaderboard locked.
+- **Files**: `/src/app/` (pages/API), `/src/components/` (UI), `/src/lib/` (auth, utils, scoring)
+- **Database**: 5 tables (users, events, availabilities, bets, leaderboard_entries)
+- **Validation**: Zod schemas in `/src/lib/validation.ts`
+- **Scoring**: `/src/lib/scoring.ts` (scoreAllBets, tie-breaking logic)
+- **Design**: Dark theme via Tailwind, minimal custom CSS in `/src/app/globals.css`
 
-## Key Constraints & Assumptions
+## References
 
-- **No real-time**: Admin manually enters final time via UI (no video analysis).
-- **No payments**: Bragging rights only. Legally simple and fun.
-- **Friend group only**: Private access, no public signup or community features.
-- **Small scale**: 8-12 users; not building for massive scale.
-- **Single event**: MVP supports one event (schema extensible for multiple future events).
-- **Admin trusted**: Admin responsibility to ensure data consistency if unlocking event with existing bets.
+- `/Handoffs/01-requirements.md` - Feature spec, data model, edge cases
+- `/Handoffs/02-architecture.md` - Tech stack, schema, 15 API endpoints, auth flow
+- `/Handoffs/03-implementer.md` - Phase 1 completed, files created, testing notes
+- `/Handoffs/04-designer.md` - Dark theme, pages, colors, implementation details
+- `/Handoffs/05-test.md` - 186 passing tests, coverage report
 
-## Testing Checklist
-
-- [ ] Calendar consensus calculation (all users = GREEN)
-- [ ] Lock date prevents availability updates
-- [ ] Unlock date reopens availability, preserves bets
-- [ ] Place bet: time_over_under (multiple allowed)
-- [ ] Place bet: exact_time_guess (one per user, updates replace old)
-- [ ] Place bet: vomit_prop (one per user, updates replace old)
-- [ ] Bet distribution display (exact_time_guess as array)
-- [ ] Results preview before finalization
-- [ ] Scoring: exact_time_guess winner (closest guess gets point, ties get both)
-- [ ] Scoring: time_over_under (over/under against final time)
-- [ ] Scoring: vomit_prop (yes/no match)
-- [ ] Leaderboard ranks by total points
-- [ ] Results finalized blocks new bets
-- [ ] Reset results (before finalize) returns all bets to pending
-
-## Links
-
-- **Requirements**: `/Handoffs/01-requirements.md` (functional spec, data model, edge cases)
-- **Architecture**: `/Handoffs/02-architecture.md` (tech stack, schema, API details, deployment)
-
-## Development Commands
-
-```bash
-npm run dev              # Start dev server
-npm run build            # Build for production
-npm run start            # Start production server
-npm run test             # Run tests
-npm run test:watch      # Watch mode
-npm run lint             # Lint code
-npm run db:studio       # Open Prisma GUI
-npx prisma migrate dev   # Create migration
-npx prisma generate     # Regenerate client
-```
-
----
-
-**Last Updated**: 2026-01-31
-**Status**: Phase 1 & 2 Complete, Ready for Testing
-**Owner**: Friend group (8-12 people)
+**Last Updated**: 2026-02-03
+**Status**: Phase 1 Complete, Ready for Deployment
+**Next**: Render.com deployment

@@ -30,7 +30,7 @@ export function TimeOverUnderForm({ onSubmit, onCancel, loading }: BetFormProps 
     }
   };
 
-  const commonThresholds = [300, 360, 420, 480, 540]; // 5, 6, 7, 8, 9 minutes
+  const commonThresholds = [360, 480, 600, 720, 840, 960]; // 6, 8, 10, 12, 14, 16 minutes
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -47,13 +47,7 @@ export function TimeOverUnderForm({ onSubmit, onCancel, loading }: BetFormProps 
           <select
             value={threshold}
             onChange={(e) => setThreshold(Number(e.target.value))}
-            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white transition-all text-sm font-medium appearance-none cursor-pointer hover:bg-white/15 hover:border-white/30"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 12px center',
-              paddingRight: '36px',
-            }}
+            className="w-full px-4 py-3 pr-10 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white transition-all text-sm font-medium appearance-none cursor-pointer hover:bg-white/15 hover:border-white/30"
           >
             {commonThresholds.map((t) => (
               <option key={t} value={t} className="bg-gray-900 text-white">

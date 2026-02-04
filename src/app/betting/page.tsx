@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { BetForm } from '@/components/BetForm';
 import { MyBetsList } from '@/components/MyBetsList';
 import { BetDistribution } from '@/components/BetDistribution';
+import { VomitPropCelebration } from '@/components/VomitPropCelebration';
 import { Spinner } from '@/components/Spinner';
 import { BetInput } from '@/lib/validation';
 
@@ -48,6 +49,8 @@ export default function BettingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [selectedBetType, setSelectedBetType] = useState<'time_over_under' | 'exact_time_guess' | 'vomit_prop' | null>(null);
   const [error, setError] = useState('');
+  const [showVomitCelebration, setShowVomitCelebration] = useState(false);
+  const [vomitPrediction, setVomitPrediction] = useState<'yes' | 'no'>('no');
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -99,15 +102,28 @@ export default function BettingPage() {
         throw new Error(errorData.error?.message || 'Failed to place bet');
       }
 
-      // Refresh bets
-      setSelectedBetType(null);
-      await fetchBets();
+      // Handle vomit prop celebration modal
+      if (betData.betType === 'vomit_prop') {
+        setVomitPrediction(betData.prediction as 'yes' | 'no');
+        setShowVomitCelebration(true);
+        await fetchBets();
+        // Form will be closed when celebration modal is dismissed
+      } else {
+        // For other bet types, close form immediately
+        setSelectedBetType(null);
+        await fetchBets();
+      }
     } catch (err) {
       throw err;
     } finally {
       setSubmitting(false);
     }
   }
+
+  const handleVomitCelebrationDismiss = () => {
+    setShowVomitCelebration(false);
+    setSelectedBetType(null);
+  };
 
   async function handleDeleteBet(betId: string) {
     try {
@@ -381,6 +397,14 @@ export default function BettingPage() {
         </div>
         </div>
       </div>
+
+      {/* Vomit Prop Celebration Modal - Rendered at page level so it persists after form closes */}
+      {showVomitCelebration && (
+        <VomitPropCelebration
+          prediction={vomitPrediction}
+          onDismiss={handleVomitCelebrationDismiss}
+        />
+      )}
     </div>
   );
 }

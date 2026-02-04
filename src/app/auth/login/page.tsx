@@ -51,53 +51,28 @@ export default function LoginPage() {
 
   return (
     <div className="h-screen w-screen relative overflow-hidden">
-      {/* Carousel - Full screen background */}
-      <Image
-        src="/images/onload-bg.png"
-        alt="Beer Mile Background"
-        fill
-        className="object-cover"
-        priority
-      />
-
       {/* Carousel Slides */}
       <div className="absolute inset-0">
-        {[0, 1, 2].map((index) => (
+        {[1, 2, 3].map((index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentCarouselIndex ? 'opacity-100' : 'opacity-0'
+              currentCarouselIndex === index - 1 ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <div className="w-full h-full bg-gradient-to-b from-blue-600 to-purple-900 flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-7xl mb-4 opacity-20">📸</div>
-                <p className="text-white text-lg opacity-60">Annie Photo {index + 1}</p>
-                <p className="text-white text-xs opacity-40 mt-2">(Placeholder - add real photos)</p>
-              </div>
-            </div>
+            <Image
+              src={`/images/annie/annie-${index}.jpg`}
+              alt={`Annie Beer Mile - Photo ${index}`}
+              fill
+              className="object-cover"
+              priority={index === 1}
+            />
           </div>
         ))}
       </div>
 
       {/* Dark Overlay (subtle) */}
       <div className="absolute inset-0 bg-black bg-opacity-30" />
-
-      {/* Carousel Indicators - Positioned absolutely */}
-      <div className="absolute bottom-16 sm:bottom-20 left-0 right-0 flex justify-center gap-2 z-30">
-        {[0, 1, 2].map((index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentCarouselIndex(index)}
-            className={`h-2 rounded-full transition-all ${
-              index === currentCarouselIndex
-                ? 'w-8 bg-white'
-                : 'w-2 bg-white bg-opacity-40 hover:bg-opacity-70'
-            }`}
-            aria-label={`Go to photo ${index + 1}`}
-          />
-        ))}
-      </div>
 
       {/* Overlay Content - Absolutely positioned */}
       <div className="absolute inset-0 z-40 flex flex-col">
@@ -106,25 +81,25 @@ export default function LoginPage() {
           <div className="absolute bottom-0 left-0 right-0 w-full flex flex-col items-center px-4 pb-6 sm:pb-8">
             {/* Title and Subtitle - Centered */}
             <div className="text-center mb-4 sm:mb-5">
-              <h1 className="text-sm sm:text-base font-black text-white tracking-widest uppercase drop-shadow-lg">
+              <h1 className="text-lg sm:text-2xl font-black text-white tracking-widest uppercase drop-shadow-lg">
                 Beer Mile 2026
               </h1>
-              <p className="text-xs sm:text-sm text-gray-200 mt-1 italic font-light drop-shadow">
+              <p className="text-sm sm:text-base neon-glow-text mt-1 italic font-light">
                 We know Annie eats muffins... but does she toss cookies?
               </p>
             </div>
 
             {/* Action Buttons - Narrower and more rounded */}
-            <div className="space-y-2 flex flex-col w-1/3">
+            <div className="space-y-2 flex flex-col w-1/2">
               <button
                 onClick={() => setShowForm(true)}
-                className="py-2.5 sm:py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-full text-xs sm:text-sm shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 duration-200 whitespace-nowrap"
+                className="py-3 sm:py-4 px-8 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-full text-sm sm:text-base shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 duration-200 whitespace-nowrap"
               >
                 Sign In
               </button>
               <Link
                 href="/auth/signup"
-                className="py-2.5 sm:py-3 px-6 border-2 border-purple-400 text-purple-300 font-semibold rounded-full text-xs sm:text-sm hover:bg-purple-900 hover:bg-opacity-20 transition-all text-center transform hover:scale-105 duration-200 whitespace-nowrap"
+                className="py-3 sm:py-4 px-8 border-2 border-purple-400 text-purple-300 font-semibold rounded-full text-sm sm:text-base hover:bg-purple-900 hover:bg-opacity-20 transition-all text-center transform hover:scale-105 duration-200 whitespace-nowrap"
               >
                 Sign Up
               </Link>
