@@ -216,11 +216,11 @@ export const Calendar: React.FC<CalendarProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-blue-500 rounded"></div>
-            <span>You're available</span>
+            <span>You&apos;re available</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-red-500 rounded"></div>
-            <span>You're unavailable</span>
+            <span>You&apos;re unavailable</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-gray-600 border-2 border-dashed border-gray-500 rounded"></div>

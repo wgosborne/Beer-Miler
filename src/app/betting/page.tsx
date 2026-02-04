@@ -223,7 +223,7 @@ export default function BettingPage() {
           {/* Header - Compact for mobile */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-4xl sm:text-5xl font-black text-white mb-1 tracking-tight">PLACE YOUR BETS</h1>
-            <p className="text-sm sm:text-base text-white/60">Annie's beer mile</p>
+            <p className="text-sm sm:text-base text-white/60">Annie&apos;s beer mile</p>
           </div>
 
 
@@ -320,7 +320,7 @@ export default function BettingPage() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <p className="font-bold text-white group-hover:text-cyan-300 transition-colors text-sm sm:text-base">Exact Time Guess</p>
-                      <p className="text-xs sm:text-sm text-white/50 mt-1">Predict Annie's exact finish time</p>
+                      <p className="text-xs sm:text-sm text-white/50 mt-1">Predict Annie&apos;s exact finish time</p>
                     </div>
                     <div className="ml-2 px-2.5 py-1 rounded-full bg-cyan-500/40 border border-cyan-400/60 text-cyan-300 font-bold text-xs whitespace-nowrap shadow-lg shadow-cyan-500/50">
                       2pts

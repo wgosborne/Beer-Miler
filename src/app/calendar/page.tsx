@@ -193,7 +193,7 @@ export default function CalendarPage() {
             Mark Your Availability
           </h1>
           <p className="text-sm sm:text-base text-gray-300">
-            Select dates you can attend Annie's beer mile
+            Select dates you can attend Annie&apos;s beer mile
           </p>
         </div>
 

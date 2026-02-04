@@ -19,7 +19,7 @@ export function VomitPropCelebration({ prediction, onDismiss }: VomitPropCelebra
     }, 4000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [handleDismiss]);
 
   const handleDismiss = () => {
     setIsVisible(false);
