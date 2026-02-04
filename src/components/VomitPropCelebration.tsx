@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 
 interface VomitPropCelebrationProps {
@@ -12,6 +12,13 @@ export function VomitPropCelebration({ prediction, onDismiss }: VomitPropCelebra
   const [isVisible, setIsVisible] = useState(true);
   const isYes = prediction === 'yes';
 
+  const handleDismiss = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onDismiss();
+    }, 300);
+  }, [onDismiss]);
+
   // Auto-dismiss after 4 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,13 +27,6 @@ export function VomitPropCelebration({ prediction, onDismiss }: VomitPropCelebra
 
     return () => clearTimeout(timer);
   }, [handleDismiss]);
-
-  const handleDismiss = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onDismiss();
-    }, 300);
-  };
 
   if (!isVisible) {
     return null;
