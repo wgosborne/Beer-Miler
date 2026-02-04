@@ -78,21 +78,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 6. Check event is locked
-    if (!event.scheduledDate) {
-      return NextResponse.json(
-        {
-          error: {
-            code: 'CONFLICT',
-            message: 'Event must be locked before entering results',
-            statusCode: 409,
-          },
-        },
-        { status: 409 }
-      );
-    }
-
-    // 7. Check results not already finalized
+    // 6. Check results not already finalized
     if (event.resultsFinalized) {
       return NextResponse.json(
         {

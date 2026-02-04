@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Leaderboard } from '@/components/Leaderboard';
+import { Spinner } from '@/components/Spinner';
 
 interface LeaderboardEntry {
   rank: number;
@@ -79,13 +80,7 @@ export default function LeaderboardPage() {
   }
 
   if (status === 'loading' || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-lg text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <Spinner fullScreen size="lg" variant="default" />;
   }
 
   if (!session?.user?.id) {

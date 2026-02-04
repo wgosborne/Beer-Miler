@@ -73,7 +73,7 @@ export async function scoreAllBets(
       userId: bet.userId,
       betType: bet.betType,
       won,
-      pointsAwarded: won ? 1 : 0,
+      pointsAwarded: won ? (bet.betType === 'exact_time_guess' ? 2 : 1) : 0,
       distance,
     });
 
@@ -194,7 +194,7 @@ export async function generateScoringPreview(
     winners.push({
       betType: 'exact_time_guess',
       users: usernames,
-      points: 1,
+      points: 2,
       details: `Closest guess: ${usernames.join(', ')} (${minDistance}s off)`,
     });
   }

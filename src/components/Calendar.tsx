@@ -46,31 +46,31 @@ function getDateColorClass(
 ): string {
   // Past dates - dark gray
   if (isPast) {
-    return 'bg-gray-400 text-white cursor-not-allowed';
+    return 'bg-gray-700 text-gray-400 cursor-not-allowed';
   }
 
-  // Event locked - lighter gray (no interaction)
+  // Event locked - darker gray (no interaction)
   if (eventLocked) {
-    return 'bg-gray-300 text-gray-700 cursor-not-allowed';
+    return 'bg-gray-700 text-gray-500 cursor-not-allowed';
   }
 
   // If user hasn't marked this date
   if (userAvail === undefined) {
-    return 'bg-gray-100 text-gray-700 border-2 border-dashed border-gray-300 cursor-pointer hover:bg-gray-200';
+    return 'bg-gray-700 text-gray-300 border-2 border-dashed border-gray-600 cursor-pointer hover:bg-gray-600';
   }
 
   // User is available
   if (userAvail) {
     // Consensus date - green
     if (day?.allAvailable) {
-      return 'bg-green-500 text-white font-bold cursor-pointer hover:bg-green-600';
+      return 'bg-green-600 text-white font-bold cursor-pointer hover:bg-green-700 shadow-lg shadow-green-600/50';
     }
-    // User available but not consensus - light blue
-    return 'bg-blue-300 text-white cursor-pointer hover:bg-blue-400';
+    // User available but not consensus - blue
+    return 'bg-blue-600 text-white cursor-pointer hover:bg-blue-700 shadow-lg shadow-blue-600/30';
   }
 
-  // User is unavailable - light red
-  return 'bg-red-300 text-white cursor-pointer hover:bg-red-400';
+  // User is unavailable - red
+  return 'bg-red-600 text-white cursor-pointer hover:bg-red-700 shadow-lg shadow-red-600/30';
 }
 
 /**
@@ -148,8 +148,8 @@ export const Calendar: React.FC<CalendarProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-primary-200 shadow-sm p-4 sm:p-6">
-      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center text-primary-900">
+    <div className="bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700 backdrop-blur-sm p-4 sm:p-6">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center text-white">
         {MONTH_NAMES[month - 1]} {year}
       </h2>
 
@@ -158,7 +158,7 @@ export const Calendar: React.FC<CalendarProps> = ({
         {DAY_NAMES.map((name) => (
           <div
             key={name}
-            className="text-center font-semibold text-primary-700 py-2 text-xs sm:text-sm"
+            className="text-center font-semibold text-purple-400 py-2 text-xs sm:text-sm"
           >
             <span className="hidden sm:inline">{name}</span>
             <span className="sm:hidden">{name[0]}</span>
@@ -174,7 +174,7 @@ export const Calendar: React.FC<CalendarProps> = ({
 
             if (!day) {
               return (
-                <div key={cellKey} className="bg-white rounded p-2"></div>
+                <div key={cellKey} className="bg-transparent rounded p-2"></div>
               );
             }
 
@@ -207,27 +207,27 @@ export const Calendar: React.FC<CalendarProps> = ({
       </div>
 
       {/* Legend */}
-      <div className="mt-6 pt-4 border-t border-primary-200">
-        <h3 className="font-semibold text-primary-900 mb-3 text-sm">Legend</h3>
-        <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+      <div className="mt-6 pt-4 border-t border-gray-700">
+        <h3 className="font-semibold text-white mb-3 text-sm">Legend</h3>
+        <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm text-gray-300">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <span>Consensus (all available)</span>
+            <span>Everyone available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-blue-300 rounded"></div>
-            <span>You available</span>
+            <div className="w-4 h-4 bg-blue-500 rounded"></div>
+            <span>You're available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-300 rounded"></div>
-            <span>You unavailable</span>
+            <div className="w-4 h-4 bg-red-500 rounded"></div>
+            <span>You're unavailable</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-gray-100 border-2 border-dashed border-gray-300 rounded"></div>
+            <div className="w-4 h-4 bg-gray-600 border-2 border-dashed border-gray-500 rounded"></div>
             <span>Not marked</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-gray-400 rounded"></div>
+            <div className="w-4 h-4 bg-gray-700 rounded"></div>
             <span>Past date</span>
           </div>
         </div>
@@ -235,18 +235,18 @@ export const Calendar: React.FC<CalendarProps> = ({
 
       {/* Consensus info */}
       {consensusDates.length > 0 && (
-        <div className="mt-6 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
-          <h3 className="font-semibold text-green-900 mb-2 text-sm">Available Dates</h3>
-          <p className="text-xs sm:text-sm text-green-800 break-words">
+        <div className="mt-6 p-3 sm:p-4 bg-green-900 bg-opacity-20 border border-green-600 border-opacity-40 rounded-lg">
+          <h3 className="font-semibold text-green-400 mb-2 text-sm">Consensus Dates</h3>
+          <p className="text-xs sm:text-sm text-green-300 break-words">
             {consensusDates.map((d) => formatDateDisplay(new Date(d))).join(', ')}
           </p>
         </div>
       )}
 
       {eventLocked && (
-        <div className="mt-4 p-3 sm:p-4 bg-primary-50 border border-primary-200 rounded-lg">
-          <p className="text-xs sm:text-sm text-primary-900 font-semibold">
-            Event date is locked. Availability cannot be changed.
+        <div className="mt-4 p-3 sm:p-4 bg-purple-900 bg-opacity-20 border border-purple-600 border-opacity-40 rounded-lg">
+          <p className="text-xs sm:text-sm text-purple-300 font-semibold">
+            Event date is locked. You cannot change your availability.
           </p>
         </div>
       )}

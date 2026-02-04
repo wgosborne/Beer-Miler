@@ -31,25 +31,43 @@ export function TimeOverUnderForm({ onSubmit, onCancel, loading }: BetFormProps 
   };
 
   const commonThresholds = [300, 360, 420, 480, 540]; // 5, 6, 7, 8, 9 minutes
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-semibold text-white mb-3 uppercase tracking-wide">
           Time Threshold
         </label>
-        <select
-          value={threshold}
-          onChange={(e) => setThreshold(Number(e.target.value))}
-          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-        >
-          {commonThresholds.map((t) => (
-            <option key={t} value={t}>
-              {Math.floor(t / 60)}:{(t % 60).toString().padStart(2, '0')} ({t}s)
-            </option>
-          ))}
-          <option value="">Custom...</option>
-        </select>
+        <div className="relative">
+          <select
+            value={threshold}
+            onChange={(e) => setThreshold(Number(e.target.value))}
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white transition-all text-sm font-medium appearance-none cursor-pointer hover:bg-white/15 hover:border-white/30"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 12px center',
+              paddingRight: '36px',
+            }}
+          >
+            {commonThresholds.map((t) => (
+              <option key={t} value={t} className="bg-gray-900 text-white">
+                {formatTime(t)} ({t}s)
+              </option>
+            ))}
+            <option value="" className="bg-gray-900 text-white">Custom...</option>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white/60">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </div>
+        </div>
         {threshold === 0 && (
           <input
             type="number"
@@ -57,55 +75,58 @@ export function TimeOverUnderForm({ onSubmit, onCancel, loading }: BetFormProps 
             max="1200"
             placeholder="Enter seconds (0-1200)"
             onChange={(e) => setThreshold(Number(e.target.value))}
-            className="w-full mt-2 px-3 sm:px-4 py-2.5 sm:py-3 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+            className="w-full mt-3 px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-white/40 transition-all text-sm font-medium hover:bg-white/15 hover:border-white/30"
           />
         )}
+        <p className="text-xs text-white/50 mt-2">
+          Selected: {formatTime(threshold)} ({threshold}s)
+        </p>
       </div>
 
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Over or Under?</label>
-        <div className="flex gap-2 sm:gap-4">
-          <label className="flex items-center gap-2 flex-1">
-            <input
-              type="radio"
-              name="direction"
-              value="over"
-              checked={direction === 'over'}
-              onChange={(e) => setDirection('over')}
-              className="w-4 h-4 text-primary-600"
-            />
-            <span className="text-sm">Over</span>
-          </label>
-          <label className="flex items-center gap-2 flex-1">
-            <input
-              type="radio"
-              name="direction"
-              value="under"
-              checked={direction === 'under'}
-              onChange={(e) => setDirection('under')}
-              className="w-4 h-4 text-primary-600"
-            />
-            <span className="text-sm">Under</span>
-          </label>
+        <label className="block text-sm font-semibold text-white mb-3">Prediction</label>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setDirection('over')}
+            className={`flex-1 py-3 rounded-lg font-bold transition-all duration-300 text-sm ${
+              direction === 'over'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                : 'bg-white/10 text-white/70 border border-white/20 hover:bg-purple-500/20'
+            }`}
+          >
+            OVER
+          </button>
+          <button
+            type="button"
+            onClick={() => setDirection('under')}
+            className={`flex-1 py-3 rounded-lg font-bold transition-all duration-300 text-sm ${
+              direction === 'under'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                : 'bg-white/10 text-white/70 border border-white/20 hover:bg-purple-500/20'
+            }`}
+          >
+            UNDER
+          </button>
         </div>
       </div>
 
-      {error && <div className="text-red-600 text-xs sm:text-sm p-2 bg-red-50 rounded">{error}</div>}
+      {error && <div className="text-red-300 text-sm p-3 bg-red-500/20 border border-red-500/30 rounded-lg">{error}</div>}
 
-      <div className="flex gap-2 sm:gap-3 pt-2">
+      <div className="flex gap-3 pt-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-primary-600 text-white py-2.5 sm:py-3 rounded-lg hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold text-sm transition-colors"
+          className="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed font-bold text-sm transition-all duration-300 shadow-lg shadow-purple-500/30"
         >
-          {loading ? 'Placing...' : 'Place Bet'}
+          {loading ? 'PLACING...' : 'PLACE BET'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 bg-gray-200 text-gray-700 py-2.5 sm:py-3 rounded-lg hover:bg-gray-300 font-semibold text-sm transition-colors"
+          className="flex-1 bg-white/10 text-white/70 py-3 rounded-lg hover:bg-white/20 font-bold text-sm transition-all duration-300 border border-white/20"
         >
-          Cancel
+          CANCEL
         </button>
       </div>
     </form>
@@ -138,53 +159,53 @@ export function ExactTimeGuessForm({ onSubmit, onCancel, loading }: BetFormProps
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-          Exact Time Guess
+        <label className="block text-sm font-semibold text-white mb-3">
+          Your Prediction
         </label>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center justify-center">
           <input
             type="number"
             min="0"
             max="20"
             value={minutes}
             onChange={(e) => setMinutes(Math.min(20, Math.max(0, Number(e.target.value))))}
-            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+            className="w-20 px-3 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white text-center font-bold text-lg placeholder-white/40 transition-all"
             placeholder="MM"
           />
-          <span className="text-lg sm:text-xl font-bold text-gray-700">:</span>
+          <span className="text-3xl font-bold text-white">:</span>
           <input
             type="number"
             min="0"
             max="59"
             value={seconds}
             onChange={(e) => setSeconds(Math.min(59, Math.max(0, Number(e.target.value))))}
-            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+            className="w-20 px-3 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white text-center font-bold text-lg placeholder-white/40 transition-all"
             placeholder="SS"
           />
         </div>
-        <p className="text-xs text-gray-500 mt-2">
-          Total: {minutes}:{seconds.toString().padStart(2, '0')} ({minutes * 60 + seconds}s)
+        <p className="text-xs text-white/50 mt-3 text-center">
+          {minutes}:{seconds.toString().padStart(2, '0')} ({minutes * 60 + seconds}s)
         </p>
       </div>
 
-      {error && <div className="text-red-600 text-xs sm:text-sm p-2 bg-red-50 rounded">{error}</div>}
+      {error && <div className="text-red-300 text-sm p-3 bg-red-500/20 border border-red-500/30 rounded-lg">{error}</div>}
 
-      <div className="flex gap-2 sm:gap-3 pt-2">
+      <div className="flex gap-3 pt-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-primary-600 text-white py-2.5 sm:py-3 rounded-lg hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold text-sm transition-colors"
+          className="flex-1 bg-cyan-600 text-white py-3 rounded-lg hover:bg-cyan-700 disabled:bg-gray-600 disabled:cursor-not-allowed font-bold text-sm transition-all duration-300 shadow-lg shadow-cyan-500/30"
         >
-          {loading ? 'Placing...' : 'Place Bet'}
+          {loading ? 'PLACING...' : 'PLACE BET'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 bg-gray-200 text-gray-700 py-2.5 sm:py-3 rounded-lg hover:bg-gray-300 font-semibold text-sm transition-colors"
+          className="flex-1 bg-white/10 text-white/70 py-3 rounded-lg hover:bg-white/20 font-bold text-sm transition-all duration-300 border border-white/20"
         >
-          Cancel
+          CANCEL
         </button>
       </div>
     </form>
@@ -210,53 +231,53 @@ export function VomitPropForm({ onSubmit, onCancel, loading }: BetFormProps & { 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-3">
-          Will Annie vomit?
+        <label className="block text-sm font-semibold text-white mb-3">
+          Will Annie Vomit?
         </label>
-        <div className="flex gap-2 sm:gap-4">
+        <div className="flex gap-3">
           <button
             type="button"
             onClick={() => setPrediction('yes')}
-            className={`flex-1 py-2.5 sm:py-3 rounded-lg font-semibold transition text-sm ${
+            className={`flex-1 py-3 rounded-lg font-bold transition-all duration-300 text-sm ${
               prediction === 'yes'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-pink-600 text-white shadow-lg shadow-pink-500/30'
+                : 'bg-white/10 text-white/70 border border-white/20 hover:bg-pink-500/20'
             }`}
           >
-            Yes 🤢
+            YES
           </button>
           <button
             type="button"
             onClick={() => setPrediction('no')}
-            className={`flex-1 py-2.5 sm:py-3 rounded-lg font-semibold transition text-sm ${
+            className={`flex-1 py-3 rounded-lg font-bold transition-all duration-300 text-sm ${
               prediction === 'no'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-pink-600 text-white shadow-lg shadow-pink-500/30'
+                : 'bg-white/10 text-white/70 border border-white/20 hover:bg-pink-500/20'
             }`}
           >
-            No ✅
+            NO
           </button>
         </div>
       </div>
 
-      {error && <div className="text-red-600 text-xs sm:text-sm p-2 bg-red-50 rounded">{error}</div>}
+      {error && <div className="text-red-300 text-sm p-3 bg-red-500/20 border border-red-500/30 rounded-lg">{error}</div>}
 
-      <div className="flex gap-2 sm:gap-3 pt-2">
+      <div className="flex gap-3 pt-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-primary-600 text-white py-2.5 sm:py-3 rounded-lg hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold text-sm transition-colors"
+          className="flex-1 bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 disabled:bg-gray-600 disabled:cursor-not-allowed font-bold text-sm transition-all duration-300 shadow-lg shadow-pink-500/30"
         >
-          {loading ? 'Placing...' : 'Place Bet'}
+          {loading ? 'PLACING...' : 'PLACE BET'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 bg-gray-200 text-gray-700 py-2.5 sm:py-3 rounded-lg hover:bg-gray-300 font-semibold text-sm transition-colors"
+          className="flex-1 bg-white/10 text-white/70 py-3 rounded-lg hover:bg-white/20 font-bold text-sm transition-all duration-300 border border-white/20"
         >
-          Cancel
+          CANCEL
         </button>
       </div>
     </form>

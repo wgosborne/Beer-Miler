@@ -69,3 +69,76 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Betting Page Neon Track Background */
+@keyframes neon-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.3)) drop-shadow(0 0 15px rgba(0, 255, 255, 0.15));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5)) drop-shadow(0 0 25px rgba(0, 255, 255, 0.3));
+  }
+}
+
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 0.22;
+  }
+  20%, 24%, 55% {
+    opacity: 0.28;
+  }
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.betting-page-background {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%);
+}
+
+.betting-page-background::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #1a1f3a 0%, #0f1419 100%);
+  z-index: -2;
+}
+
+/* Neon SVG track styling */
+svg[viewBox="0 0 1200 800"] {
+  animation: neon-flicker 4s ease-in-out infinite, float-gentle 6s ease-in-out infinite;
+}
+
+/* Individual neon elements glow */
+svg[viewBox="0 0 1200 800"] ellipse[stroke="#00ffff"],
+svg[viewBox="0 0 1200 800"] circle[fill="#00ffff"] {
+  animation: neon-pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px rgba(0, 255, 255, 0.4));
+}
+
+.track-outline {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  height: 70vh;
+  max-width: 1200px;
+  max-height: 800px;
+  opacity: 0.08;
+  z-index: -1;
+  pointer-events: none;
+  animation: neon-flicker 4s ease-in-out infinite;
+}

@@ -32,7 +32,7 @@ export function MyBetsList({ bets, loading, onDeleteBet, resultsFinalized }: MyB
 
   if (bets.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-12 text-white/50">
         <p>No bets placed yet. Choose a bet type to get started!</p>
       </div>
     );
@@ -43,34 +43,34 @@ export function MyBetsList({ bets, loading, onDeleteBet, resultsFinalized }: MyB
       {bets.map((bet) => (
         <div
           key={bet.id}
-          className="bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-center hover:shadow-md transition"
+          className="bg-white/5 border border-white/10 rounded-lg p-5 flex justify-between items-center hover:bg-white/8 hover:border-white/20 transition-all duration-300 group"
         >
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-gray-800">{formatBetType(bet.betType)}</span>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="font-bold text-white text-sm">{formatBetType(bet.betType)}</span>
               <span
-                className={`text-xs px-2 py-1 rounded ${
+                className={`text-xs px-3 py-1 rounded-full font-semibold ${
                   bet.status === 'pending'
-                    ? 'bg-yellow-100 text-yellow-800'
+                    ? 'bg-yellow-500/30 text-yellow-300 border border-yellow-500/30'
                     : bet.status === 'won'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                    ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-red-500/30 text-red-300 border border-red-500/30'
                 }`}
               >
                 {bet.status === 'pending' ? 'Pending' : bet.status === 'won' ? 'Won' : 'Lost'}
               </span>
             </div>
-            <p className="text-sm text-gray-600">{formatBetDetails(bet)}</p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-sm text-white/70">{formatBetDetails(bet)}</p>
+            <p className="text-xs text-white/40 mt-2">
               {new Date(bet.createdAt).toLocaleDateString()} {new Date(bet.createdAt).toLocaleTimeString()}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 ml-4">
+          <div className="flex items-center gap-4 ml-4">
             {bet.pointsAwarded > 0 && (
               <div className="text-right">
-                <p className="text-2xl font-bold text-green-600">{bet.pointsAwarded}</p>
-                <p className="text-xs text-gray-500">points</p>
+                <p className="text-3xl font-black text-emerald-400">{bet.pointsAwarded}</p>
+                <p className="text-xs text-emerald-300/60 font-semibold">POINTS</p>
               </div>
             )}
 
@@ -78,7 +78,7 @@ export function MyBetsList({ bets, loading, onDeleteBet, resultsFinalized }: MyB
               <button
                 onClick={() => handleDelete(bet.id)}
                 disabled={deletingId === bet.id || loading}
-                className="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 disabled:bg-gray-200 disabled:text-gray-400 text-sm"
+                className="px-4 py-2 bg-red-600/20 text-red-300 rounded-lg hover:bg-red-600/40 disabled:bg-gray-600/20 disabled:text-gray-400 text-sm font-semibold transition-all duration-300 border border-red-600/30"
               >
                 {deletingId === bet.id ? 'Deleting...' : 'Delete'}
               </button>
@@ -93,13 +93,13 @@ export function MyBetsList({ bets, loading, onDeleteBet, resultsFinalized }: MyB
 function formatBetType(betType: string): string {
   switch (betType) {
     case 'time_over_under':
-      return 'Time Over/Under';
+      return 'TIME OVER/UNDER';
     case 'exact_time_guess':
-      return 'Exact Time Guess';
+      return 'EXACT TIME GUESS';
     case 'vomit_prop':
-      return 'Vomit Prop';
+      return 'VOMIT PROP';
     default:
-      return betType;
+      return betType.toUpperCase();
   }
 }
 
@@ -110,15 +110,15 @@ function formatBetDetails(bet: BetData): string {
     case 'time_over_under':
       const minutes = Math.floor(data.thresholdSeconds / 60);
       const seconds = data.thresholdSeconds % 60;
-      return `${data.direction === 'over' ? '>' : '<'} ${minutes}:${seconds.toString().padStart(2, '0')} (${data.thresholdSeconds}s)`;
+      return `${data.direction === 'over' ? 'Over' : 'Under'} ${minutes}:${seconds.toString().padStart(2, '0')} (${data.thresholdSeconds}s)`;
 
     case 'exact_time_guess':
       const m = Math.floor(data.guessedTimeSeconds / 60);
       const s = data.guessedTimeSeconds % 60;
-      return `Guess: ${m}:${s.toString().padStart(2, '0')} (${data.guessedTimeSeconds}s)`;
+      return `${m}:${s.toString().padStart(2, '0')} (${data.guessedTimeSeconds}s)`;
 
     case 'vomit_prop':
-      return data.prediction === 'yes' ? 'Prediction: Yes, she will vomit 🤢' : 'Prediction: No, she will not vomit ✅';
+      return data.prediction === 'yes' ? 'She will vomit' : 'She will not vomit';
 
     default:
       return 'Unknown bet type';

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Calendar } from '@/components/Calendar';
 import { AdminLockPanel } from '@/components/AdminLockPanel';
+import { Spinner } from '@/components/Spinner';
 
 interface AvailabilityDay {
   date: string;
@@ -173,14 +174,7 @@ export default function CalendarPage() {
   };
 
   if (status === 'loading' || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block animate-spin">⏳</div>
-          <p className="mt-2 text-gray-600">Loading calendar...</p>
-        </div>
-      </div>
-    );
+    return <Spinner fullScreen size="lg" variant="default" />;
   }
 
   if (!session?.user) {
@@ -191,37 +185,37 @@ export default function CalendarPage() {
   const month = currentMonth.getMonth() + 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-4 sm:py-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black py-4 sm:py-8">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary-900 mb-1">
-            📅 Calendar
+          <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">
+            Mark Your Availability
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">
-            Mark your availability for Annie's beer mile
+          <p className="text-sm sm:text-base text-gray-300">
+            Select dates you can attend Annie's beer mile
           </p>
         </div>
 
         {/* Error message */}
         {error && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm sm:text-base">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-900 bg-opacity-30 border border-red-600 text-red-200 rounded-lg text-sm sm:text-base">
             {error}
           </div>
         )}
 
         {/* Event status */}
         {eventData && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white border border-primary-200 rounded-lg">
-            <p className="text-xs sm:text-sm text-gray-700">
-              <strong className="text-primary-900">Event:</strong> {eventData.name}
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-800 bg-opacity-50 border border-gray-700 rounded-lg backdrop-blur-sm">
+            <p className="text-xs sm:text-sm text-gray-200">
+              <span className="text-purple-400 font-semibold">Event Status:</span> {eventData.name}
               {eventData.scheduledDate ? (
-                <span className="block sm:inline sm:ml-2 text-primary-600 font-semibold mt-1 sm:mt-0">
-                  Locked for {new Date(eventData.scheduledDate).toLocaleDateString()}
+                <span className="block sm:inline sm:ml-2 text-green-400 font-semibold mt-1 sm:mt-0">
+                  Confirmed for {new Date(eventData.scheduledDate).toLocaleDateString()}
                 </span>
               ) : (
-                <span className="block sm:inline sm:ml-2 text-amber-600 mt-1 sm:mt-0">
-                  Waiting for consensus...
+                <span className="block sm:inline sm:ml-2 text-yellow-400 mt-1 sm:mt-0">
+                  Awaiting consensus...
                 </span>
               )}
             </p>
@@ -260,37 +254,37 @@ export default function CalendarPage() {
 
             {/* Your availability */}
             {calendarData && (
-              <div className="bg-white rounded-lg border border-primary-200 p-4 sm:p-6 shadow-sm">
-                <h3 className="text-sm sm:text-base font-bold text-primary-900 mb-3 sm:mb-4 flex items-center gap-2">
-                  <span>✓</span> Your Status
+              <div className="bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700 p-4 sm:p-6 backdrop-blur-sm">
+                <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4">
+                  Your Status
                 </h3>
-                <div className="text-xs sm:text-sm text-gray-700 space-y-2 sm:space-y-3">
-                  <div className="flex justify-between p-2 bg-green-50 rounded">
-                    <span>Available:</span>
-                    <strong className="text-green-700">{Object.values(calendarData.userAvailability).filter((v) => v === true).length}</strong>
+                <div className="text-xs sm:text-sm text-gray-200 space-y-2 sm:space-y-3">
+                  <div className="flex justify-between p-2 sm:p-3 bg-green-900 bg-opacity-20 border border-green-700 border-opacity-40 rounded">
+                    <span className="text-gray-300">Available:</span>
+                    <strong className="text-green-400">{Object.values(calendarData.userAvailability).filter((v) => v === true).length}</strong>
                   </div>
-                  <div className="flex justify-between p-2 bg-red-50 rounded">
-                    <span>Unavailable:</span>
-                    <strong className="text-red-700">{Object.values(calendarData.userAvailability).filter((v) => v === false).length}</strong>
+                  <div className="flex justify-between p-2 sm:p-3 bg-red-900 bg-opacity-20 border border-red-700 border-opacity-40 rounded">
+                    <span className="text-gray-300">Unavailable:</span>
+                    <strong className="text-red-400">{Object.values(calendarData.userAvailability).filter((v) => v === false).length}</strong>
                   </div>
-                  <div className="flex justify-between p-2 bg-gray-50 rounded">
-                    <span>Not marked:</span>
-                    <strong className="text-gray-700">{Object.values(calendarData.userAvailability).filter((v) => v === undefined).length}</strong>
+                  <div className="flex justify-between p-2 sm:p-3 bg-gray-700 bg-opacity-30 border border-gray-600 border-opacity-40 rounded">
+                    <span className="text-gray-300">Not marked:</span>
+                    <strong className="text-gray-400">{Object.values(calendarData.userAvailability).filter((v) => v === undefined).length}</strong>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Info panel */}
-            <div className="bg-primary-50 rounded-lg border border-primary-200 p-4 sm:p-6 shadow-sm">
-              <h3 className="text-sm sm:text-base font-bold text-primary-900 mb-3 sm:mb-4 flex items-center gap-2">
-                <span>🎯</span> How It Works
+            <div className="bg-gray-800 bg-opacity-50 rounded-lg border border-purple-500 border-opacity-30 p-4 sm:p-6 backdrop-blur-sm">
+              <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4">
+                How It Works
               </h3>
-              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-700">
-                <p><strong>1. Mark:</strong> Click dates to show availability.</p>
-                <p><strong>2. Consensus:</strong> Green = everyone available.</p>
-                <p><strong>3. Lock:</strong> Admin locks the final date.</p>
-                <p><strong>4. Bet:</strong> Place your bets after lock.</p>
+              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
+                <p><span className="text-purple-400 font-semibold">1. Mark:</span> Click dates to show availability.</p>
+                <p><span className="text-purple-400 font-semibold">2. Consensus:</span> Green dates = everyone available.</p>
+                <p><span className="text-purple-400 font-semibold">3. Lock:</span> Admin confirms the final date.</p>
+                <p><span className="text-purple-400 font-semibold">4. Bet:</span> Place your bets once locked.</p>
               </div>
             </div>
           </div>
@@ -300,21 +294,21 @@ export default function CalendarPage() {
         <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4">
           <button
             onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-            className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all text-sm sm:text-base shadow-lg hover:shadow-xl"
           >
             Previous
           </button>
 
           <button
             onClick={() => setCurrentMonth(new Date())}
-            className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all text-sm sm:text-base shadow-lg hover:shadow-xl"
           >
             Today
           </button>
 
           <button
             onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-            className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all text-sm sm:text-base shadow-lg hover:shadow-xl"
           >
             Next
           </button>

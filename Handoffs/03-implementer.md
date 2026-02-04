@@ -717,11 +717,87 @@ The endpoints are protected by middleware. Access them through the browser UI or
 
 ---
 
-**Last Updated:** 2026-01-31 by Claude (Implementer Agent)
-**Current Phase:** Phase 1c - Betting System (COMPLETE)
+**Last Updated:** 2026-02-03 by Claude (Implementer Agent)
+**Current Phase:** Phase 1c - Betting System (COMPLETE + Routing Updates)
 **Completed Phases:** Phase 0 (Setup), Phase 1a (Auth), Phase 1b (Calendar), Phase 1c (Betting)
+**Latest Changes:** Updated home page routing logic to redirect users immediately
 **Next Phase:** Phase 3 - Testing, Polish, Logging, and Deployment
 **Ready for Review:** Yes - Phase 1c complete with all betting, scoring, and admin functionality
+
+## Recent Changes (Feb 3, 2026)
+
+### Change 5: Updated Exact Time Guess Scoring to 2 Points
+**Files:**
+- `/src/lib/scoring.ts` (lines 76 and 197)
+- `/src/app/betting/page.tsx` (point values guide added)
+
+**What:**
+- Changed exact time guess winning bets from 1 point to 2 points
+- Updated scoring logic in `scoreAllBets` function to award 2 points for exact_time_guess winners
+- Updated preview generator in `generateScoringPreview` to display 2 points for exact_time_guess
+- Added visible point values guide on betting page showing all three bet types and their point values
+
+**Why:**
+- Exact time guess is harder to predict than other bet types
+- Increased reward incentivizes more strategic guessing
+- Makes leaderboard more competitive and interesting
+
+**Implementation Details:**
+1. In `scoreAllBets()`: Changed `pointsAwarded: won ? 1 : 0` to `pointsAwarded: won ? (bet.betType === 'exact_time_guess' ? 2 : 1) : 0`
+2. In `generateScoringPreview()`: Changed `points: 1` to `points: 2` in the exact_time_guess winners block
+3. In `/betting page`: Added new "Point Values" section at top showing:
+   - Time Over/Under: 1 point (purple)
+   - Exact Time Guess: 2 points (cyan)
+   - Vomit Prop: 1 point (pink)
+
+**Impact:**
+- Users now understand the point structure before betting
+- Exact time guess winners earn double the standard bet reward
+- Leaderboard calculations automatically account for 2-point wins
+- No database migration needed (existing bets keep original 1-point value; new winners score 2 points)
+
+### Change 4: Removed Dashboard Link from Header Navigation
+**File:** `/src/components/Header.tsx`
+- **What:** Removed Dashboard link from both desktop and mobile navigation menus
+- **Why:** Home page (/) now redirects to login or betting automatically - no dashboard UI exists anymore
+- **Removed Items:**
+  - Line 23: `const isDashboard = pathname === '/'` (path check no longer needed)
+  - Lines 45-54: Desktop nav Dashboard link with `isDashboard` styling
+  - Lines 172-182: Mobile menu Dashboard link with active state styling
+- **Result:** Header navigation now shows only: Calendar, Betting, Results (for authenticated users)
+- **Impact:** Cleaner menu, no dead navigation link
+
+### Change 3: Updated Home Page Routing Logic
+**File:** `/src/app/page.tsx`
+- **What:** Replaced dashboard display with automatic redirect logic
+- **Before:** Home page showed landing page to anonymous users, dashboard to authenticated users
+- **After:** Home page now redirects based on auth status:
+  - Not logged in → Redirect to `/auth/login`
+  - Logged in → Redirect to `/betting`
+- **Implementation:**
+  - Used `useEffect` with `useSession()` to detect auth status changes
+  - Router redirects after status is determined (not during loading)
+  - Shows loading spinner during auth check
+- **Behavior:** Fully automatic - no UI interaction needed. Loading state properly handled.
+
+### Change 1: Removed Event Lock Requirement for Results Entry
+**File:** `/src/app/api/admin/results/route.ts` (lines 81-93 removed)
+- **What:** Deleted validation check that required event to be locked before admin could enter results
+- **Why:** To allow admins to enter results at any time, regardless of event lock status
+- **Impact:** Admins can now preview and finalize results immediately without needing event date to be locked first
+- **Tests:** Admin can use Results page to enter final time and vomit outcome anytime
+
+### Change 2: Added Navigation Menu Items
+**File:** `/src/components/Header.tsx` (multiple additions)
+- **What:** Added two new navigation links to both desktop and mobile menus
+  - "Betting" link to `/betting` page
+  - "Results" link to `/results` page
+- **How:**
+  - Added `isBettingPage` and `isResultsPage` path checks (lines 21-22)
+  - Added Betting and Results links to desktop nav (lines 67-86)
+  - Added Betting and Results links to mobile nav (lines 174-195)
+- **Styling:** Links highlight when active and follow existing design pattern
+- **Mobile Support:** Mobile menu items close on click and respond to active state
 
 ## Summary of Implementation
 
