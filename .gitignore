@@ -20,8 +20,6 @@ dist/
 .env.test.local
 
 # Prisma
-prisma/migrations/
-.prisma/
 *.db
 *.sqlite
 *.sqlite3
