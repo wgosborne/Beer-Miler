@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Annie's Beer Mile",
   description: 'Friendly betting app for Annie beer mile performance',
   viewport: 'width=device-width, initial-scale=1.0',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

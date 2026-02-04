@@ -22,7 +22,10 @@ export function parseTime(timeStr: string): number {
  * Get ISO date string (YYYY-MM-DD) from a Date object
  */
 export function toISODate(date: Date): string {
-  return date.toISOString().split('T')[0];
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 /**

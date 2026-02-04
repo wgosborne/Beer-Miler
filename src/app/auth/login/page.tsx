@@ -85,21 +85,21 @@ export default function LoginPage() {
                 Beer Mile 2026
               </h1>
               <p className="text-sm sm:text-base neon-glow-text mt-1 italic font-light">
-                We know Annie eats muffins... but does she toss cookies?
+                We know Annie likes muffins... but does she toss cookies?
               </p>
             </div>
 
-            {/* Action Buttons - Narrower and more rounded */}
-            <div className="space-y-2 flex flex-col w-1/2">
+            {/* Action Buttons - Wider on mobile, with glow effect */}
+            <div className="space-y-2 flex flex-col w-3/4">
               <button
                 onClick={() => setShowForm(true)}
-                className="py-3 sm:py-4 px-8 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-full text-sm sm:text-base shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 duration-200 whitespace-nowrap"
+                className="py-3 sm:py-4 px-8 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-full text-sm sm:text-base shadow-2xl hover:shadow-purple-500/50 hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 duration-200 whitespace-nowrap" style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)' }}
               >
                 Sign In
               </button>
               <Link
                 href="/auth/signup"
-                className="py-3 sm:py-4 px-8 border-2 border-purple-400 text-purple-300 font-semibold rounded-full text-sm sm:text-base hover:bg-purple-900 hover:bg-opacity-20 transition-all text-center transform hover:scale-105 duration-200 whitespace-nowrap"
+                className="py-3 sm:py-4 px-8 border-2 border-purple-400 text-purple-300 font-semibold rounded-full text-sm sm:text-base hover:bg-purple-900 hover:bg-opacity-20 transition-all text-center transform hover:scale-105 duration-200 whitespace-nowrap" style={{ boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)' }}
               >
                 Sign Up
               </Link>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Beer mug body -->
+  <rect x="15" y="20" width="50" height="55" rx="5" fill="black" stroke="black" stroke-width="2"/>
+  <!-- Beer foam top -->
+  <ellipse cx="40" cy="20" rx="28" ry="8" fill="white" stroke="black" stroke-width="1.5"/>
+  <!-- Beer inside (darker area) -->
+  <rect x="18" y="28" width="44" height="42" fill="#1a1a1a"/>
+  <!-- Mug handle -->
+  <path d="M 68 35 Q 82 45 68 60" stroke="black" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>

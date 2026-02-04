@@ -92,8 +92,7 @@ export async function GET(req: NextRequest) {
     const calendarData: Record<string, AvailabilityDay> = {};
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month - 1, day);
-      const dateStr = toISODate(date);
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
       // Find all availability records for this date
       const dayAvailabilities = availabilities.filter(

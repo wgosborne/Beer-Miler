@@ -5,6 +5,7 @@ import {
   getCalendarGrid,
   toISODate,
   isPastDate,
+  fromISODate,
   getMonthStart,
   formatDateDisplay,
 } from '@/lib/utils';
@@ -127,12 +128,11 @@ export const Calendar: React.FC<CalendarProps> = ({
   const handleDateClick = async (day: number | null) => {
     if (!day) return;
 
-    const date = new Date(year, month - 1, day);
-    const dateStr = toISODate(date);
+    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const currentAvail = userAvailability[dateStr];
 
     // Don't allow clicking if locked or past
-    if (eventLocked || isPastDate(date)) return;
+    if (eventLocked || isPastDate(fromISODate(dateStr))) return;
 
     setLoadingDates((prev) => new Set(prev).add(dateStr));
     try {
