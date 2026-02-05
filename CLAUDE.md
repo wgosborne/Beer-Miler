@@ -4,7 +4,7 @@ Friendly betting app for 8-12 person friend group. Three bet types, scoring syst
 
 ## Current Status
 
-**Phase 1 Complete**: Auth + Calendar + Betting + Scoring + Leaderboard. Code complete, tested (186 passing tests), design finalized (dark theme). Ready for production deployment to Render.
+**Phase 1 Complete + Polish**: Auth + Calendar + Betting + Scoring + Leaderboard. Code complete, tested (186 passing tests), design finalized (dark theme with playful favicon and enhanced UI). Ready for production deployment to Render.
 
 ## Tech Stack
 
@@ -105,7 +105,8 @@ Login at `http://localhost:3000` with `admin@beer-mile.test` / `admin123`.
 **Design:**
 - [x] Dark theme (black, purple/blue accents)
 - [x] Mobile-first (iPhone 414px base)
-- [x] Auth carousel with neon subtitle glow
+- [x] Auth carousel with neon subtitle glow & enhanced visibility
+- [x] Playful cartoony beer cup favicon (SVG)
 - [x] Responsive pages (home, calendar, betting, results, leaderboard)
 
 **Production Ready:**
@@ -138,6 +139,6 @@ Login at `http://localhost:3000` with `admin@beer-mile.test` / `admin123`.
 - `/Handoffs/04-designer.md` - Dark theme, pages, colors, implementation details
 - `/Handoffs/05-test.md` - 186 passing tests, coverage report
 
-**Last Updated**: 2026-02-03
-**Status**: Phase 1 Complete, Ready for Deployment
+**Last Updated**: 2026-02-04
+**Status**: Phase 1 Complete + UI Polish, Ready for Deployment
 **Next**: Render.com deployment

@@ -57,6 +57,7 @@
 - Next.js Image with fill + object-cover
 - Carousel continues rotating even when form is open
 - Clickable indicators at bottom (z-30)
+- Subtitle font size increased (text-base sm:text-lg) for better visibility and prominence
 
 **Bet Type Cards:**
 - Color-coded: Purple (over/under), Cyan (exact time), Pink (vomit prop)
@@ -75,12 +76,17 @@
 - Buttons: `py-3 px-4 sm:px-6 font-bold rounded-lg transition-all`
 - Inputs: `w-full px-4 py-3 bg-gray-900 border-gray-700 rounded-lg focus:border-purple-500`
 
-## Images
+## Images & Favicon
 
 **Carousel Background:**
 - Location: `public/images/onload-bg.png` (fallback/placeholder)
 - Ready for Annie photos in: `public/images/annie/annie-1.jpg`, `annie-2.jpg`, `annie-3.jpg`
 - Next.js Image with responsive sizing (fill, object-cover)
+
+**Favicon:**
+- Location: `public/favicon.svg` (playful cartoony black beer cup)
+- SVG design features: beer cup, foam bubbles, mug handle, highlight, gold sparkle accents
+- Referenced in layout.tsx metadata for browser tab icon
 
 **Vomit Prop Modal Placeholders:**
 - YES: `public/images/annie/annie-angry.jpg` (determined expression)
@@ -99,6 +105,7 @@
 2. Carousel auto-loads and displays images with fade transitions
 3. Design complete and production-ready
 
-**Design Completed**: 2026-02-03
-**Version**: 3.0 (Vomit Prop Celebration Modal)
+**Design Completed**: 2026-02-04
+**Version**: 3.1 (Favicon + UI Polish)
 **All Pages**: Complete and deployed
+**Latest Changes**: Playful beer cup favicon, enhanced login subtitle visibility
