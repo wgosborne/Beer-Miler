@@ -79,14 +79,21 @@ export function isOutof3MonthWindow(date: Date): boolean {
 }
 
 /**
- * Format a date for display (e.g., "Mon, Jan 15, 2026")
+ * Format a date for display using UTC components (e.g., "Mon, Jan 15, 2026")
  */
 export function formatDateDisplay(date: Date): string {
-  return date.toLocaleDateString('en-US', {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+  const day = date.getUTCDate();
+
+  const dateObj = new Date(Date.UTC(year, month, day));
+
+  return dateObj.toLocaleDateString('en-US', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
   });
 }
 
