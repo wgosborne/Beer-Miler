@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { toISODate, formatDateDisplay } from '@/lib/utils';
+import { toISODate, formatDateDisplay, fromISODate } from '@/lib/utils';
 
 interface AdminLockPanelProps {
   consensusDates: string[];
@@ -38,7 +38,7 @@ export const AdminLockPanel: React.FC<AdminLockPanelProps> = ({
     setIsLocking(true);
     try {
       await onLockDate(selectedDate);
-      setSuccess(`Event locked for ${formatDateDisplay(new Date(selectedDate))}`);
+      setSuccess(`Event locked for ${formatDateDisplay(fromISODate(selectedDate))}`);
       setSelectedDate('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to lock date');
@@ -72,7 +72,7 @@ export const AdminLockPanel: React.FC<AdminLockPanelProps> = ({
           The event date has been locked and confirmed.
         </p>
         <p className="font-semibold text-green-400 text-sm">
-          {formatDateDisplay(new Date(lockedDate))}
+          {formatDateDisplay(fromISODate(lockedDate))}
         </p>
         <p className="text-xs text-green-300 mt-3">
           Betting is now available. Availability cannot be changed.
@@ -132,7 +132,7 @@ export const AdminLockPanel: React.FC<AdminLockPanelProps> = ({
                   className="w-4 h-4 text-purple-500"
                 />
                 <span className="text-xs sm:text-sm text-purple-300">
-                  {formatDateDisplay(new Date(date))}
+                  {formatDateDisplay(fromISODate(date))}
                 </span>
               </label>
             ))}

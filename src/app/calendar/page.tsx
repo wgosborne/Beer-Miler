@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Calendar } from '@/components/Calendar';
 import { AdminLockPanel } from '@/components/AdminLockPanel';
 import { Spinner } from '@/components/Spinner';
+import { fromISODate } from '@/lib/utils';
 
 interface AvailabilityDay {
   date: string;
@@ -211,7 +212,7 @@ export default function CalendarPage() {
               <span className="text-purple-400 font-semibold">Event Status:</span> {eventData.name}
               {eventData.scheduledDate ? (
                 <span className="block sm:inline sm:ml-2 text-green-400 font-semibold mt-1 sm:mt-0">
-                  Confirmed for {new Date(eventData.scheduledDate).toLocaleDateString()}
+                  Confirmed for {fromISODate(eventData.scheduledDate).toLocaleDateString()}
                 </span>
               ) : (
                 <span className="block sm:inline sm:ml-2 text-yellow-400 mt-1 sm:mt-0">

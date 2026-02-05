@@ -238,7 +238,7 @@ export const Calendar: React.FC<CalendarProps> = ({
         <div className="mt-6 p-3 sm:p-4 bg-green-900 bg-opacity-20 border border-green-600 border-opacity-40 rounded-lg">
           <h3 className="font-semibold text-green-400 mb-2 text-sm">Consensus Dates</h3>
           <p className="text-xs sm:text-sm text-green-300 break-words">
-            {consensusDates.map((d) => formatDateDisplay(new Date(d))).join(', ')}
+            {consensusDates.map((d) => formatDateDisplay(fromISODate(d))).join(', ')}
           </p>
         </div>
       )}

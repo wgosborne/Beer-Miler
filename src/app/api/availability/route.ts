@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionFromRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { toISODate, getMonthStart, getMonthEnd, isPastDate, isOutof3MonthWindow } from '@/lib/utils';
+import { toISODate, getMonthStart, getMonthEnd, isPastDate, isOutof3MonthWindow, fromISODate } from '@/lib/utils';
 import { AvailabilityUpdateSchema } from '@/lib/validation';
 
 interface AvailabilityDay {
@@ -137,7 +137,7 @@ export async function GET(req: NextRequest) {
 
     // Find consensus dates (all available)
     const consensusDates = Object.entries(calendarData)
-      .filter(([_, day]) => day.allAvailable && !isPastDate(new Date(day.date)))
+      .filter(([_, day]) => day.allAvailable && !isPastDate(fromISODate(day.date)))
       .map(([dateStr, _]) => dateStr);
 
     return NextResponse.json(
