@@ -81,7 +81,7 @@ export default function LoginPage() {
           <div className="absolute bottom-0 left-0 right-0 w-full flex flex-col items-center px-4 pb-6 sm:pb-8">
             {/* Title and Subtitle - Centered */}
             <div className="text-center mb-4 sm:mb-5">
-              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-widest uppercase drop-shadow-lg" style={{ textShadow: '0 0 40px rgba(168, 85, 247, 0.8)' }}>
+              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-widest uppercase drop-shadow-lg" style={{ textShadow: '0 0 20px rgba(168, 85, 247, 1), 0 0 40px rgba(168, 85, 247, 0.9), 0 0 60px rgba(168, 85, 247, 0.7), 0 0 80px rgba(168, 85, 247, 0.5)' }}>
                 Beer Mile 2026
               </h1>
               <p className="text-base sm:text-lg neon-glow-text mt-1 italic font-light">
@@ -104,11 +104,6 @@ export default function LoginPage() {
                 Sign Up
               </Link>
             </div>
-
-            {/* Demo Credentials - Minimal line */}
-            <p className="text-center mt-3 sm:mt-4 text-xs text-gray-300 drop-shadow">
-              Demo: <code className="text-purple-300">admin@beer-mile.test</code> / <code className="text-purple-300">admin123</code>
-            </p>
           </div>
         ) : (
           // Form View - Centered modal overlay
